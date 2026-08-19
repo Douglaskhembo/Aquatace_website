@@ -13,6 +13,9 @@ export default defineConfig({
       disableCsrfMiddlewareWarning: true,
     },
   },
+  nitro: {
+    preset: "node-server",
+  },
   vite: {
     server: { port: 8091 },
     resolve: { tsconfigPaths: true },
