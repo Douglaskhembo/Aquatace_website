@@ -61,7 +61,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: ({ context }) => context.queryClient.ensureQueryData(productsQueryOptions),
+  loader: ({ context }) => context.queryClient.ensureQueryData(productsQueryOptions).catch(() => []),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -110,7 +110,7 @@ function RootComponent() {
 }
 
 function RootInner() {
-  const { data: products } = useSuspenseQuery(productsQueryOptions);
+  const { data: products = [] } = useSuspenseQuery(productsQueryOptions);
   return (
     <CartProvider allProducts={products}>
       <div className="flex min-h-dvh flex-col overflow-x-clip">
