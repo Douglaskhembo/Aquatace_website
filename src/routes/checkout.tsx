@@ -283,8 +283,10 @@ function CheckoutPage() {
                   </>
                 )}
               </Button>
-              <p className="mt-3 text-center text-xs text-muted-foreground">
-                We'll open WhatsApp with your order details so you can confirm it directly.
+              <p className="mt-3 rounded-xl bg-amber-50 p-2.5 text-center text-xs text-amber-900">
+                <span className="font-semibold">Required:</span> we'll open WhatsApp with your order
+                details — you must send that message to confirm your order. WhatsApp is the only way
+                to confirm or reach us about your order.
               </p>
             </CardContent>
           </Card>

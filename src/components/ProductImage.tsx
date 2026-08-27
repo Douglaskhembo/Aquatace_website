@@ -1,12 +1,12 @@
 import { Droplet } from "lucide-react";
 import type { CategorySlug } from "@/lib/products";
-import gasCylinders from "@/assets/gas-cylinders-kenya.jpg.asset.json";
+import { GAS_CATEGORY_IMAGE_URL } from "@/assets/gas-category-image";
 import catWater from "@/assets/cat-water.jpg";
 import catElectronics from "@/assets/cat-electronics.jpg";
 
 const map: Record<CategorySlug, { grad: string; Icon: typeof Droplet; image?: string }> = {
   water: { grad: "gradient-water", Icon: Droplet, image: catWater },
-  gas: { grad: "gradient-gas", Icon: Droplet, image: gasCylinders.url },
+  gas: { grad: "gradient-gas", Icon: Droplet, image: GAS_CATEGORY_IMAGE_URL },
   electronics: { grad: "gradient-electronics", Icon: Droplet, image: catElectronics },
 };
 

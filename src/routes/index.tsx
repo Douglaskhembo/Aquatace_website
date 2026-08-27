@@ -8,7 +8,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { waLink } from "@/lib/business";
 import { productsQueryOptions } from "@/lib/products.functions";
 import flyerAsset from "@/assets/aquatace-flyer.png.asset.json";
-import gasCylinders from "@/assets/gas-cylinders-kenya.jpg.asset.json";
+import { GAS_CATEGORY_IMAGE_URL } from "@/assets/gas-category-image";
 import catWater from "@/assets/cat-water.jpg";
 import catElectronics from "@/assets/cat-electronics.jpg";
 
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/")({
 
 const CATEGORY_TILES = [
   { slug: "water" as const, name: "Water", img: catWater, Icon: Droplet, count: "500ml – 20L" },
-  { slug: "gas" as const, name: "Gas", img: gasCylinders.url, Icon: Zap, count: "6kg & 13kg" },
+  { slug: "gas" as const, name: "Gas", img: GAS_CATEGORY_IMAGE_URL, Icon: Zap, count: "6kg & 13kg" },
   { slug: "electronics" as const, name: "Electronics", img: catElectronics, Icon: Headphones, count: "Oraimo · Samsung" },
 ];
 
@@ -73,7 +73,7 @@ function Home() {
                 <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">Water</span>
               </Link>
               <Link to="/category/$slug" params={{ slug: "gas" }} className="group relative block overflow-hidden rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary">
-                <img src={gasCylinders.url} alt="Cooking gas cylinders" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <img src={GAS_CATEGORY_IMAGE_URL} alt="Cooking gas cylinders" loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 <span className="absolute bottom-2 left-2 rounded-full bg-white/90 px-2.5 py-1 text-xs font-semibold text-foreground shadow-sm">Gas</span>
               </Link>
               <Link to="/category/$slug" params={{ slug: "electronics" }} className="group relative block overflow-hidden rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary">

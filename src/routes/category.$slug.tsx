@@ -8,10 +8,14 @@ import { productsQueryOptions } from "@/lib/products.functions";
 import { listBranches } from "@/lib/branches.functions";
 import catWater from "@/assets/cat-water.jpg";
 import catElectronics from "@/assets/cat-electronics.jpg";
-import gasCylinders from "@/assets/gas-cylinders-kenya.jpg.asset.json";
+import { GAS_CATEGORY_IMAGE_URL } from "@/assets/gas-category-image";
 import { ChevronRight, X } from "lucide-react";
 
-const imgMap: Record<CategorySlug, string> = { water: catWater, gas: gasCylinders.url, electronics: catElectronics };
+const imgMap: Record<CategorySlug, string> = {
+  water: catWater,
+  gas: GAS_CATEGORY_IMAGE_URL,
+  electronics: catElectronics,
+};
 
 export const Route = createFileRoute("/category/$slug")({
   beforeLoad: ({ params }) => {

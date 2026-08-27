@@ -76,8 +76,8 @@ function SuccessPage() {
             Thank you for your order!
           </h1>
           <p className="mt-3 text-muted-foreground">
-            We've received your order and notified the assigned branch. Please confirm via WhatsApp
-            for fastest dispatch.
+            We've received your order and notified the assigned branch. One step left — send your
+            order on WhatsApp below.
           </p>
         </div>
 
@@ -113,8 +113,10 @@ function SuccessPage() {
                 <MessageCircle className="h-5 w-5" /> Send your order on WhatsApp
               </a>
             )}
-            <p className="mt-2 text-center text-xs text-muted-foreground">
-              Tap the button to open WhatsApp with your full order details prefilled.
+            <p className="mt-3 rounded-xl bg-amber-50 p-2.5 text-center text-xs text-amber-900">
+              <span className="font-semibold">Required:</span> tap the button and send the prefilled
+              message. WhatsApp is the only way to confirm your order or reach us to call about it —
+              we can't process orders that aren't confirmed there.
             </p>
 
             {q.isLoading && (

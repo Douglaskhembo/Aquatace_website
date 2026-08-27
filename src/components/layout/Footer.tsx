@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import {
-  Droplet,
   Facebook,
   Instagram,
   Mail,
@@ -12,6 +11,7 @@ import {
 } from "lucide-react";
 import { business, branches } from "@/lib/business";
 import { Button } from "@/components/ui/button";
+import { LOGO_URL, LOGO_WIDTH, LOGO_HEIGHT } from "@/assets/logo";
 
 export function Footer() {
   return (
@@ -19,17 +19,13 @@ export function Footer() {
       <div className="container-page py-14">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-12">
           <div className="lg:col-span-4">
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-10 w-10 place-items-center rounded-2xl gradient-water text-white shadow">
-                <Droplet className="h-5 w-5" strokeWidth={2.4} />
-              </span>
-              <div className="flex flex-col leading-none">
-                <span className="text-lg font-extrabold tracking-tight">Aquatace</span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-primary">
-                  Water &amp; Gas
-                </span>
-              </div>
-            </div>
+            <img
+              src={LOGO_URL}
+              alt="Aquatace Water & Gas"
+              className="h-16 w-auto"
+              width={LOGO_WIDTH}
+              height={LOGO_HEIGHT}
+            />
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
               Water refills, bottled water and cooking gas supply for local visibility and fast
               customer ordering.

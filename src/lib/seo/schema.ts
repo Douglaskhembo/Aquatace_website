@@ -5,7 +5,7 @@
 import type { BranchInfo } from "@/lib/business";
 import { business } from "@/lib/business";
 import type { Product } from "@/lib/products";
-import logoAsset from "@/assets/aquatace-logo.png.asset.json";
+import { LOGO_MASTER_URL } from "@/assets/logo";
 import { SITE_URL } from "./config";
 
 // Placeholder social links in business.ts (bare homepages, no handle) aren't real
@@ -74,7 +74,7 @@ export function buildOrganizationSchema() {
     "@id": `${SITE_URL}#organization`,
     name: business.name,
     url: SITE_URL,
-    logo: `${SITE_URL}${logoAsset.url}`,
+    logo: LOGO_MASTER_URL,
     telephone: business.phoneHref.replace("tel:", ""),
     email: business.email,
     ...(REAL_SOCIAL_LINKS.length > 0 ? { sameAs: REAL_SOCIAL_LINKS } : {}),

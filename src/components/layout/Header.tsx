@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, ShoppingBag, Phone, X, MessageCircle } from "lucide-react";
-import logoAsset from "@/assets/aquatace-logo.png.asset.json";
+import { LOGO_URL, LOGO_WIDTH, LOGO_HEIGHT } from "@/assets/logo";
 import { useState } from "react";
 import { useCart } from "@/lib/cart";
 import { Button } from "@/components/ui/button";
@@ -29,11 +29,11 @@ export function Header() {
           {/* Logo */}
           <Link to="/" className="flex items-center shrink-0" aria-label="Aquatace home">
             <img
-              src={logoAsset.url}
+              src={LOGO_URL}
               alt="Aquatace Water & Gas"
-              className="h-9 w-auto sm:h-10 lg:h-11"
-              width={220}
-              height={44}
+              className="h-10 w-auto sm:h-11 lg:h-12"
+              width={LOGO_WIDTH}
+              height={LOGO_HEIGHT}
             />
           </Link>
 
