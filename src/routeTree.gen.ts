@@ -19,14 +19,19 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CustomWaterRouteImport } from './routes/custom-water'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as LocationsRouteImport } from './routes/locations'
 import { Route as OrderSuccessRouteImport } from './routes/order-success'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProductsRouteImport } from './routes/products'
+import { Route as ServiceAreasRouteImport } from './routes/service-areas'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as BranchesSlugRouteImport } from './routes/branches.$slug'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
+import { Route as LocationsSlugRouteImport } from './routes/locations.$slug'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as ServiceAreasSlugRouteImport } from './routes/service-areas.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -78,6 +83,11 @@ const GalleryRoute = GalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocationsRoute = LocationsRouteImport.update({
+  id: '/locations',
+  path: '/locations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrderSuccessRoute = OrderSuccessRouteImport.update({
   id: '/order-success',
   path: '/order-success',
@@ -91,6 +101,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ProductsRoute = ProductsRouteImport.update({
   id: '/products',
   path: '/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiceAreasRoute = ServiceAreasRouteImport.update({
+  id: '/service-areas',
+  path: '/service-areas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -108,77 +123,107 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const BranchesSlugRoute = BranchesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => BranchesRoute,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LocationsSlugRoute = LocationsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => LocationsRoute,
 } as any)
 const ProductIdRoute = ProductIdRouteImport.update({
   id: '/product/$id',
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServiceAreasSlugRoute = ServiceAreasSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ServiceAreasRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
-  '/branches': typeof BranchesRoute
+  '/branches': typeof BranchesRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/custom-water': typeof CustomWaterRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/locations': typeof LocationsRouteWithChildren
   '/order-success': typeof OrderSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRoute
+  '/service-areas': typeof ServiceAreasRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/branches/$slug': typeof BranchesSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/locations/$slug': typeof LocationsSlugRoute
   '/product/$id': typeof ProductIdRoute
+  '/service-areas/$slug': typeof ServiceAreasSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
-  '/branches': typeof BranchesRoute
+  '/branches': typeof BranchesRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/custom-water': typeof CustomWaterRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/locations': typeof LocationsRouteWithChildren
   '/order-success': typeof OrderSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRoute
+  '/service-areas': typeof ServiceAreasRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/branches/$slug': typeof BranchesSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/locations/$slug': typeof LocationsSlugRoute
   '/product/$id': typeof ProductIdRoute
+  '/service-areas/$slug': typeof ServiceAreasSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
-  '/branches': typeof BranchesRoute
+  '/branches': typeof BranchesRouteWithChildren
   '/cart': typeof CartRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/custom-water': typeof CustomWaterRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/locations': typeof LocationsRouteWithChildren
   '/order-success': typeof OrderSuccessRoute
   '/privacy': typeof PrivacyRoute
   '/products': typeof ProductsRoute
+  '/service-areas': typeof ServiceAreasRouteWithChildren
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/branches/$slug': typeof BranchesSlugRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/locations/$slug': typeof LocationsSlugRoute
   '/product/$id': typeof ProductIdRoute
+  '/service-areas/$slug': typeof ServiceAreasSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -193,14 +238,19 @@ export interface FileRouteTypes {
     | '/custom-water'
     | '/faq'
     | '/gallery'
+    | '/locations'
     | '/order-success'
     | '/privacy'
     | '/products'
+    | '/service-areas'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/login'
+    | '/branches/$slug'
     | '/category/$slug'
+    | '/locations/$slug'
     | '/product/$id'
+    | '/service-areas/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -213,14 +263,19 @@ export interface FileRouteTypes {
     | '/custom-water'
     | '/faq'
     | '/gallery'
+    | '/locations'
     | '/order-success'
     | '/privacy'
     | '/products'
+    | '/service-areas'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/login'
+    | '/branches/$slug'
     | '/category/$slug'
+    | '/locations/$slug'
     | '/product/$id'
+    | '/service-areas/$slug'
   id:
     | '__root__'
     | '/'
@@ -233,30 +288,37 @@ export interface FileRouteTypes {
     | '/custom-water'
     | '/faq'
     | '/gallery'
+    | '/locations'
     | '/order-success'
     | '/privacy'
     | '/products'
+    | '/service-areas'
     | '/sitemap.xml'
     | '/terms'
     | '/admin/login'
+    | '/branches/$slug'
     | '/category/$slug'
+    | '/locations/$slug'
     | '/product/$id'
+    | '/service-areas/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
-  BranchesRoute: typeof BranchesRoute
+  BranchesRoute: typeof BranchesRouteWithChildren
   CartRoute: typeof CartRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   CustomWaterRoute: typeof CustomWaterRoute
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
+  LocationsRoute: typeof LocationsRouteWithChildren
   OrderSuccessRoute: typeof OrderSuccessRoute
   PrivacyRoute: typeof PrivacyRoute
   ProductsRoute: typeof ProductsRoute
+  ServiceAreasRoute: typeof ServiceAreasRouteWithChildren
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   CategorySlugRoute: typeof CategorySlugRoute
@@ -335,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/locations': {
+      id: '/locations'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof LocationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/order-success': {
       id: '/order-success'
       path: '/order-success'
@@ -354,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/products'
       fullPath: '/products'
       preLoaderRoute: typeof ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/service-areas': {
+      id: '/service-areas'
+      path: '/service-areas'
+      fullPath: '/service-areas'
+      preLoaderRoute: typeof ServiceAreasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -377,6 +453,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/branches/$slug': {
+      id: '/branches/$slug'
+      path: '/$slug'
+      fullPath: '/branches/$slug'
+      preLoaderRoute: typeof BranchesSlugRouteImport
+      parentRoute: typeof BranchesRoute
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -384,12 +467,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategorySlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/locations/$slug': {
+      id: '/locations/$slug'
+      path: '/$slug'
+      fullPath: '/locations/$slug'
+      preLoaderRoute: typeof LocationsSlugRouteImport
+      parentRoute: typeof LocationsRoute
+    }
     '/product/$id': {
       id: '/product/$id'
       path: '/product/$id'
       fullPath: '/product/$id'
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/service-areas/$slug': {
+      id: '/service-areas/$slug'
+      path: '/$slug'
+      fullPath: '/service-areas/$slug'
+      preLoaderRoute: typeof ServiceAreasSlugRouteImport
+      parentRoute: typeof ServiceAreasRoute
     }
   }
 }
@@ -404,20 +501,58 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface BranchesRouteChildren {
+  BranchesSlugRoute: typeof BranchesSlugRoute
+}
+
+const BranchesRouteChildren: BranchesRouteChildren = {
+  BranchesSlugRoute: BranchesSlugRoute,
+}
+
+const BranchesRouteWithChildren = BranchesRoute._addFileChildren(
+  BranchesRouteChildren,
+)
+
+interface LocationsRouteChildren {
+  LocationsSlugRoute: typeof LocationsSlugRoute
+}
+
+const LocationsRouteChildren: LocationsRouteChildren = {
+  LocationsSlugRoute: LocationsSlugRoute,
+}
+
+const LocationsRouteWithChildren = LocationsRoute._addFileChildren(
+  LocationsRouteChildren,
+)
+
+interface ServiceAreasRouteChildren {
+  ServiceAreasSlugRoute: typeof ServiceAreasSlugRoute
+}
+
+const ServiceAreasRouteChildren: ServiceAreasRouteChildren = {
+  ServiceAreasSlugRoute: ServiceAreasSlugRoute,
+}
+
+const ServiceAreasRouteWithChildren = ServiceAreasRoute._addFileChildren(
+  ServiceAreasRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
-  BranchesRoute: BranchesRoute,
+  BranchesRoute: BranchesRouteWithChildren,
   CartRoute: CartRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   CustomWaterRoute: CustomWaterRoute,
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
+  LocationsRoute: LocationsRouteWithChildren,
   OrderSuccessRoute: OrderSuccessRoute,
   PrivacyRoute: PrivacyRoute,
   ProductsRoute: ProductsRoute,
+  ServiceAreasRoute: ServiceAreasRouteWithChildren,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   CategorySlugRoute: CategorySlugRoute,

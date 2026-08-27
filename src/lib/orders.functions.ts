@@ -13,12 +13,18 @@ const LocationSchema = z.object({
   address: z.string().min(3).max(500),
   lat: z.number().gte(-90).lte(90),
   lng: z.number().gte(-180).lte(180),
+  landmark: z.string().trim().max(200).optional(),
 });
 
 const CreateOrderSchema = z.object({
   customer: z.object({
     name: z.string().trim().min(2).max(120),
-    phone: z.string().trim().min(7).max(30).regex(/^\+?[\d\s-]+$/),
+    phone: z
+      .string()
+      .trim()
+      .min(7)
+      .max(30)
+      .regex(/^\+?[\d\s-]+$/),
     email: z.string().trim().email().max(200).optional().or(z.literal("")),
   }),
   delivery: LocationSchema,
@@ -45,7 +51,11 @@ export const assignNearestBranch = createServerFn({ method: "POST" })
     if (!branches || branches.length === 0) throw new Error("No active branches available.");
 
     // Try Google Routes API compute matrix
-    let best: { branch: typeof branches[number]; distance_km: number; duration_min: number } | null = null;
+    let best: {
+      branch: (typeof branches)[number];
+      distance_km: number;
+      duration_min: number;
+    } | null = null;
     try {
       const LOVABLE_API_KEY = process.env.LOVABLE_API_KEY;
       const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
@@ -61,9 +71,13 @@ export const assignNearestBranch = createServerFn({ method: "POST" })
               "X-Goog-FieldMask": "originIndex,destinationIndex,distanceMeters,duration,status",
             },
             body: JSON.stringify({
-              origins: [{ waypoint: { location: { latLng: { latitude: data.lat, longitude: data.lng } } } }],
+              origins: [
+                { waypoint: { location: { latLng: { latitude: data.lat, longitude: data.lng } } } },
+              ],
               destinations: branches.map((b) => ({
-                waypoint: { location: { latLng: { latitude: b.latitude, longitude: b.longitude } } },
+                waypoint: {
+                  location: { latLng: { latitude: b.latitude, longitude: b.longitude } },
+                },
               })),
               travelMode: "DRIVE",
               routingPreference: "TRAFFIC_UNAWARE",
@@ -84,7 +98,8 @@ export const assignNearestBranch = createServerFn({ method: "POST" })
             const dur = row.duration ? parseFloat(row.duration) / 60 : km * 2;
             const branch = branches[row.destinationIndex];
             if (!branch) continue;
-            if (!best || km < best.distance_km) best = { branch, distance_km: km, duration_min: dur };
+            if (!best || km < best.distance_km)
+              best = { branch, distance_km: km, duration_min: dur };
           }
         } else {
           console.warn("Routes API failed", res.status, await res.text().catch(() => ""));
@@ -97,8 +112,12 @@ export const assignNearestBranch = createServerFn({ method: "POST" })
     if (!best) {
       // Haversine fallback
       for (const b of branches) {
-        const km = haversineKm({ lat: data.lat, lng: data.lng }, { lat: b.latitude, lng: b.longitude });
-        if (!best || km < best.distance_km) best = { branch: b, distance_km: km, duration_min: km * 3 };
+        const km = haversineKm(
+          { lat: data.lat, lng: data.lng },
+          { lat: b.latitude, lng: b.longitude },
+        );
+        if (!best || km < best.distance_km)
+          best = { branch: b, distance_km: km, duration_min: km * 3 };
       }
     }
 
@@ -108,7 +127,10 @@ export const assignNearestBranch = createServerFn({ method: "POST" })
     if (best && best.distance_km > OUT_OF_COVERAGE_KM) {
       const membley = branches.find((b) => /membley/i.test(b.name));
       if (membley && membley.id !== best.branch.id) {
-        const km = haversineKm({ lat: data.lat, lng: data.lng }, { lat: membley.latitude, lng: membley.longitude });
+        const km = haversineKm(
+          { lat: data.lat, lng: data.lng },
+          { lat: membley.latitude, lng: membley.longitude },
+        );
         best = { branch: membley, distance_km: km, duration_min: km * 3 };
       }
     }
@@ -151,12 +173,21 @@ export const createOrder = createServerFn({ method: "POST" })
       const found = branches.find((b) => b.id === data.branch_override_id);
       if (found) {
         assigned = found;
-        bestKm = haversineKm({ lat: data.delivery.lat, lng: data.delivery.lng }, { lat: found.latitude, lng: found.longitude });
+        bestKm = haversineKm(
+          { lat: data.delivery.lat, lng: data.delivery.lng },
+          { lat: found.latitude, lng: found.longitude },
+        );
       }
     } else {
       for (const b of branches) {
-        const km = haversineKm({ lat: data.delivery.lat, lng: data.delivery.lng }, { lat: b.latitude, lng: b.longitude });
-        if (km < bestKm) { bestKm = km; assigned = b; }
+        const km = haversineKm(
+          { lat: data.delivery.lat, lng: data.delivery.lng },
+          { lat: b.latitude, lng: b.longitude },
+        );
+        if (km < bestKm) {
+          bestKm = km;
+          assigned = b;
+        }
       }
       // Out-of-coverage fallback → Membley main branch.
       const OUT_OF_COVERAGE_KM = 15;
@@ -164,7 +195,10 @@ export const createOrder = createServerFn({ method: "POST" })
         const membley = branches.find((b) => /membley/i.test(b.name));
         if (membley) {
           assigned = membley;
-          bestKm = haversineKm({ lat: data.delivery.lat, lng: data.delivery.lng }, { lat: membley.latitude, lng: membley.longitude });
+          bestKm = haversineKm(
+            { lat: data.delivery.lat, lng: data.delivery.lng },
+            { lat: membley.latitude, lng: membley.longitude },
+          );
         }
       }
     }
@@ -186,15 +220,23 @@ export const createOrder = createServerFn({ method: "POST" })
               "X-Goog-FieldMask": "routes.distanceMeters,routes.duration",
             },
             body: JSON.stringify({
-              origin: { location: { latLng: { latitude: assigned.latitude, longitude: assigned.longitude } } },
-              destination: { location: { latLng: { latitude: data.delivery.lat, longitude: data.delivery.lng } } },
+              origin: {
+                location: {
+                  latLng: { latitude: assigned.latitude, longitude: assigned.longitude },
+                },
+              },
+              destination: {
+                location: { latLng: { latitude: data.delivery.lat, longitude: data.delivery.lng } },
+              },
               travelMode: "DRIVE",
               routingPreference: "TRAFFIC_UNAWARE",
             }),
           },
         );
         if (r.ok) {
-          const j = (await r.json()) as { routes?: Array<{ distanceMeters?: number; duration?: string }> };
+          const j = (await r.json()) as {
+            routes?: Array<{ distanceMeters?: number; duration?: string }>;
+          };
           const route = j.routes?.[0];
           if (route?.distanceMeters) bestKm = route.distanceMeters / 1000;
           if (route?.duration) durationMin = Math.round(parseFloat(route.duration) / 60);
@@ -217,6 +259,7 @@ export const createOrder = createServerFn({ method: "POST" })
         delivery_address: data.delivery.address,
         delivery_lat: data.delivery.lat,
         delivery_lng: data.delivery.lng,
+        delivery_landmark: data.delivery.landmark || null,
         delivery_notes: data.notes || null,
         assigned_branch_id: assigned.id,
         estimated_distance_km: Math.round(bestKm * 10) / 10,
@@ -246,8 +289,16 @@ export const createOrder = createServerFn({ method: "POST" })
       const { sendOrderNotifications } = await import("./notifications.server");
       await sendOrderNotifications({
         orderNumber,
-        customer: { name: data.customer.name, phone: data.customer.phone, email: data.customer.email || null },
-        delivery: { ...data.delivery, notes: data.notes || null },
+        customer: {
+          name: data.customer.name,
+          phone: data.customer.phone,
+          email: data.customer.email || null,
+        },
+        delivery: {
+          ...data.delivery,
+          landmark: data.delivery.landmark || null,
+          notes: data.notes || null,
+        },
         branch: assigned,
         items: data.items,
         subtotal_kes: subtotal,
@@ -262,13 +313,15 @@ export const createOrder = createServerFn({ method: "POST" })
   });
 
 export const getOrderByNumber = createServerFn({ method: "GET" })
-  .inputValidator((input: unknown) => z.object({ order_number: z.string().min(6).max(50) }).parse(input))
+  .inputValidator((input: unknown) =>
+    z.object({ order_number: z.string().min(6).max(50) }).parse(input),
+  )
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: order, error } = await supabaseAdmin
       .from("orders")
       .select(
-        "id,order_number,customer_name,customer_phone,customer_email,delivery_address,delivery_lat,delivery_lng,delivery_notes,estimated_distance_km,estimated_duration_min,subtotal_kes,total_kes,delivery_status,created_at,assigned_branch_id",
+        "id,order_number,customer_name,customer_phone,customer_email,delivery_address,delivery_lat,delivery_lng,delivery_landmark,delivery_notes,estimated_distance_km,estimated_duration_min,subtotal_kes,total_kes,delivery_status,created_at,assigned_branch_id",
       )
       .eq("order_number", data.order_number)
       .maybeSingle();
@@ -276,8 +329,15 @@ export const getOrderByNumber = createServerFn({ method: "GET" })
     if (!order) return null;
 
     const [{ data: branch }, { data: items }] = await Promise.all([
-      supabaseAdmin.from("branches").select("id,name,area,phone,whatsapp,email,latitude,longitude,opening_hours").eq("id", order.assigned_branch_id!).maybeSingle(),
-      supabaseAdmin.from("order_items").select("product_name,quantity,unit_price_kes,subtotal_kes").eq("order_id", order.id),
+      supabaseAdmin
+        .from("branches")
+        .select("id,name,area,phone,whatsapp,email,latitude,longitude,opening_hours")
+        .eq("id", order.assigned_branch_id!)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("order_items")
+        .select("product_name,quantity,unit_price_kes,subtotal_kes")
+        .eq("order_id", order.id),
     ]);
     return { order, branch, items: items ?? [] };
   });

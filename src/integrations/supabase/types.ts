@@ -167,6 +167,7 @@ export type Database = {
           delivery_address: string
           delivery_fee_kes: number
           delivery_lat: number
+          delivery_landmark: string | null
           delivery_lng: number
           delivery_notes: string | null
           delivery_status: string
@@ -187,6 +188,7 @@ export type Database = {
           delivery_address: string
           delivery_fee_kes?: number
           delivery_lat: number
+          delivery_landmark?: string | null
           delivery_lng: number
           delivery_notes?: string | null
           delivery_status?: string
@@ -207,6 +209,7 @@ export type Database = {
           delivery_address?: string
           delivery_fee_kes?: number
           delivery_lat?: number
+          delivery_landmark?: string | null
           delivery_lng?: number
           delivery_notes?: string | null
           delivery_status?: string

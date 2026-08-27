@@ -23,6 +23,7 @@ import { productsQueryOptions } from "@/lib/products.functions";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
+import { buildOrganizationSchema } from "@/lib/seo/schema";
 
 function NotFoundComponent() {
   return (
@@ -30,10 +31,16 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <p className="text-sm font-semibold uppercase tracking-widest text-primary">404</p>
         <h1 className="mt-3 text-4xl font-bold">Page not found</h1>
-        <p className="mt-3 text-muted-foreground">The page you're looking for doesn't exist or has been moved.</p>
+        <p className="mt-3 text-muted-foreground">
+          The page you're looking for doesn't exist or has been moved.
+        </p>
         <div className="mt-8 flex justify-center gap-3">
-          <Button asChild><Link to="/">Go home</Link></Button>
-          <Button asChild variant="outline"><Link to="/products">Shop products</Link></Button>
+          <Button asChild>
+            <Link to="/">Go home</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/products">Shop products</Link>
+          </Button>
         </div>
       </div>
     </div>
@@ -52,8 +59,17 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <h1 className="text-xl font-semibold">Something went wrong</h1>
         <p className="mt-2 text-sm text-muted-foreground">Please try again or head back home.</p>
         <div className="mt-6 flex justify-center gap-3">
-          <Button onClick={() => { router.invalidate(); reset(); }}>Try again</Button>
-          <Button asChild variant="outline"><a href="/">Go home</a></Button>
+          <Button
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
+          >
+            Try again
+          </Button>
+          <Button asChild variant="outline">
+            <a href="/">Go home</a>
+          </Button>
         </div>
       </div>
     </div>
@@ -61,26 +77,44 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  loader: ({ context }) => context.queryClient.ensureQueryData(productsQueryOptions).catch(() => []),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(productsQueryOptions).catch(() => []),
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Aquatace Water & Gas — Water Refills & Cooking Gas Delivery in Nairobi" },
-      { name: "description", content: "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a." },
+      {
+        name: "description",
+        content:
+          "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a.",
+      },
       { name: "author", content: "Aquatace Water & Gas" },
       { name: "theme-color", content: "#0EA5E9" },
       { property: "og:site_name", content: "Aquatace Water & Gas" },
-      { property: "og:title", content: "Aquatace Water & Gas — Water Refills & Cooking Gas Delivery in Nairobi" },
-      { property: "og:description", content: "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a." },
+      {
+        property: "og:title",
+        content: "Aquatace Water & Gas — Water Refills & Cooking Gas Delivery in Nairobi",
+      },
+      {
+        property: "og:description",
+        content:
+          "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Aquatace Water & Gas — Water Refills & Cooking Gas Delivery in Nairobi" },
-      { name: "twitter:description", content: "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a." },
+      {
+        name: "twitter:title",
+        content: "Aquatace Water & Gas — Water Refills & Cooking Gas Delivery in Nairobi",
+      },
+      {
+        name: "twitter:description",
+        content:
+          "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a.",
+      },
+      { "script:ld+json": buildOrganizationSchema() },
     ],
-    links: [
-      { rel: "stylesheet", href: appCss },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -91,7 +125,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <head><HeadContent /></head>
+      <head>
+        <HeadContent />
+      </head>
       <body>
         {children}
         <Scripts />

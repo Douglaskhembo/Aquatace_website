@@ -4,8 +4,17 @@ import type { Branch } from "./branches.functions";
 interface OrderNotifPayload {
   orderNumber: string;
   customer: { name: string; phone: string; email: string | null };
-  delivery: { address: string; lat: number; lng: number; notes: string | null };
-  branch: Pick<Branch, "id" | "name" | "area" | "phone" | "whatsapp" | "email" | "latitude" | "longitude"> & {
+  delivery: {
+    address: string;
+    lat: number;
+    lng: number;
+    landmark: string | null;
+    notes: string | null;
+  };
+  branch: Pick<
+    Branch,
+    "id" | "name" | "area" | "phone" | "whatsapp" | "email" | "latitude" | "longitude"
+  > & {
     email: string | null;
   };
   items: Array<{ product_name: string; quantity: number; unit_price_kes: number }>;
@@ -17,8 +26,10 @@ interface OrderNotifPayload {
 const KES = (n: number) => `KES ${new Intl.NumberFormat("en-KE").format(n)}`;
 
 export async function sendOrderNotifications(p: OrderNotifPayload): Promise<void> {
-  const mapsLink = `https://www.google.com/maps/search/?api=1&query=${p.delivery.lat},${p.delivery.lng}`;
-  const itemsText = p.items.map((i) => `• ${i.quantity} × ${i.product_name} — ${KES(i.unit_price_kes * i.quantity)}`).join("\n");
+  const mapsLink = `https://www.google.com/maps?q=${p.delivery.lat},${p.delivery.lng}`;
+  const itemsText = p.items
+    .map((i) => `• ${i.quantity} × ${i.product_name} — ${KES(i.unit_price_kes * i.quantity)}`)
+    .join("\n");
 
   // Branch email (via Lovable transactional email queue if available)
   await enqueueEmail({
@@ -31,6 +42,7 @@ export async function sendOrderNotifications(p: OrderNotifPayload): Promise<void
       customerName: p.customer.name,
       customerPhone: p.customer.phone,
       deliveryAddress: p.delivery.address,
+      deliveryLandmark: p.delivery.landmark ?? "—",
       mapsLink,
       itemsText,
       subtotal: KES(p.subtotal_kes),
@@ -75,7 +87,10 @@ async function enqueueEmail(payload: {
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // enqueue_email RPC is added by email_domain--setup_email_infra; cast until then.
-    const rpc = (supabaseAdmin.rpc as unknown as (fn: string, args: unknown) => Promise<{ error: { message: string } | null }>);
+    const rpc = supabaseAdmin.rpc as unknown as (
+      fn: string,
+      args: unknown,
+    ) => Promise<{ error: { message: string } | null }>;
     const { error } = await rpc("enqueue_email", {
       queue_name: "transactional_emails",
       payload: {

@@ -33,11 +33,18 @@ export type BranchInfo = {
   blurb: string;
   available: string;
   serves: string;
-  phone: string;      // display
-  phoneHref: string;  // tel:
-  whatsapp: string;   // digits only, e.g. 254795199701
+  phone: string; // display
+  phoneHref: string; // tel:
+  whatsapp: string; // digits only, e.g. 254795199701
   offer?: string;
   featured?: boolean;
+  /** County the branch sits in — for LocalBusiness schema and county-level SEO pages. */
+  county: "Nairobi" | "Kiambu";
+  /** Full postal-style address, for LocalBusiness schema. */
+  address: string;
+  latitude: number;
+  longitude: number;
+  openingHours: string;
 };
 
 export const branches: BranchInfo[] = [
@@ -52,6 +59,11 @@ export const branches: BranchInfo[] = [
     whatsapp: "254795199701",
     offer: "10% discount + free delivery",
     featured: true,
+    county: "Nairobi",
+    address: "Marurui, Nairobi",
+    latitude: -1.228,
+    longitude: 36.8536,
+    openingHours: "Mon-Sun 07:00-21:00",
   },
   {
     slug: "kihunguro",
@@ -64,6 +76,11 @@ export const branches: BranchInfo[] = [
     whatsapp: "254713727229",
     offer: "10% discount + free delivery",
     featured: true,
+    county: "Kiambu",
+    address: "Kihunguro, Ruiru",
+    latitude: -1.153,
+    longitude: 36.97,
+    openingHours: "Mon-Sun 07:00-21:00",
   },
   {
     slug: "membley",
@@ -76,6 +93,11 @@ export const branches: BranchInfo[] = [
     whatsapp: "254707201072",
     offer: "10% discount + free delivery",
     featured: true,
+    county: "Kiambu",
+    address: "Membley Estate, Ruiru",
+    latitude: -1.165,
+    longitude: 36.955,
+    openingHours: "Mon-Sun 07:00-21:00",
   },
   {
     slug: "tinganga",
@@ -87,6 +109,11 @@ export const branches: BranchInfo[] = [
     phoneHref: "tel:+254112819068",
     whatsapp: "254112819068",
     offer: "Shop location — no current offer",
+    county: "Kiambu",
+    address: "Ting'ang'a, Kiambu",
+    latitude: -1.155,
+    longitude: 36.81,
+    openingHours: "Mon-Sun 07:00-21:00",
   },
 ];
 

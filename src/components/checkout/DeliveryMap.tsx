@@ -1,35 +1,45 @@
-import { useEffect, useRef, useState } from "react";
-import { Loader2, LocateFixed, MapPin, Search, Wifi, WifiOff } from "lucide-react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { ClientOnly } from "@tanstack/react-router";
+import { CheckCircle2, Loader2, LocateFixed, MapPin, Search, Wifi, WifiOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useOnline } from "@/hooks/use-online";
+import type { LatLng } from "./LeafletMap";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-declare global { interface Window { google: any; __aqtInitMap?: () => void; } }
+const LeafletMap = lazy(() => import("./LeafletMap"));
 
-const NAIROBI = { lat: -1.2921, lng: 36.8219 };
+const NAIROBI: LatLng = { lat: -1.2921, lng: 36.8219 };
 
 export interface DeliveryLocation {
   address: string;
   lat: number;
   lng: number;
+  landmark?: string;
+  instructions?: string;
 }
 
-let mapsPromise: Promise<void> | null = null;
-function loadMaps(key: string): Promise<void> {
-  if (typeof window === "undefined") return Promise.reject(new Error("SSR"));
-  if (window.google?.maps) return Promise.resolve();
-  if (mapsPromise) return mapsPromise;
-  mapsPromise = new Promise((resolve, reject) => {
-    window.__aqtInitMap = () => resolve();
-    const s = document.createElement("script");
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=places&loading=async&callback=__aqtInitMap&v=weekly`;
-    s.async = true;
-    s.defer = true;
-    s.onerror = () => reject(new Error("Failed to load Google Maps"));
-    document.head.appendChild(s);
-  });
-  return mapsPromise;
+interface NominatimResult {
+  display_name: string;
+  lat: string;
+  lon: string;
+}
+
+async function reverseGeocode(pos: LatLng, signal?: AbortSignal): Promise<string> {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${pos.lat}&lon=${pos.lng}&zoom=18&addressdetails=1`;
+  const res = await fetch(url, { signal, headers: { Accept: "application/json" } });
+  if (!res.ok) throw new Error("Reverse geocoding failed");
+  const json = (await res.json()) as { display_name?: string };
+  if (!json.display_name) throw new Error("No address found for this location");
+  return json.display_name;
+}
+
+async function searchAddress(query: string, signal?: AbortSignal): Promise<NominatimResult[]> {
+  const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&countrycodes=ke&limit=5&addressdetails=0`;
+  const res = await fetch(url, { signal, headers: { Accept: "application/json" } });
+  if (!res.ok) throw new Error("Search failed");
+  return (await res.json()) as NominatimResult[];
 }
 
 interface Props {
@@ -38,122 +48,147 @@ interface Props {
 }
 
 export function DeliveryMap({ value, onChange }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mapRef = useRef<any>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const markerRef = useRef<any>(null);
-  const [ready, setReady] = useState(false);
-  const [locating, setLocating] = useState(false);
+  const [pin, setPin] = useState<LatLng | null>(value ? { lat: value.lat, lng: value.lng } : null);
+  const [address, setAddress] = useState(value?.address ?? "");
+  const [addressLoading, setAddressLoading] = useState(false);
+  const [confirmed, setConfirmed] = useState(!!value);
+  const [landmark, setLandmark] = useState(value?.landmark ?? "");
+  const [instructions, setInstructions] = useState(value?.instructions ?? "");
   const [error, setError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
 
-  const apiKey = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
+  const [query, setQuery] = useState(value?.address ?? "");
+  const [searching, setSearching] = useState(false);
+  const [results, setResults] = useState<NominatimResult[]>([]);
+  const [flyToken, setFlyToken] = useState(0);
+  const [flyCenter, setFlyCenter] = useState<LatLng>(pin ?? NAIROBI);
 
-  useEffect(() => {
-    if (!apiKey) { setError("Google Maps key not configured."); return; }
-    let cancelled = false;
-    loadMaps(apiKey).then(() => {
-      if (cancelled) return;
-      const g = window.google;
-      const start = value ?? NAIROBI;
-      const map = new g.maps.Map(containerRef.current!, {
-        center: start,
-        zoom: value ? 15 : 12,
-        disableDefaultUI: false,
-        streetViewControl: false,
-        mapTypeControl: false,
-        fullscreenControl: false,
-      });
-      mapRef.current = map;
-      const marker = new g.maps.Marker({
-        map,
-        position: start,
-        draggable: true,
-        animation: g.maps.Animation.DROP,
-      });
-      markerRef.current = marker;
-
-      marker.addListener("dragend", () => {
-        const p = marker.getPosition();
-        if (!p) return;
-        reverseGeocode(p.lat(), p.lng()).then((addr) => {
-          const next = { address: addr, lat: p.lat(), lng: p.lng() };
-          if (inputRef.current) inputRef.current.value = addr;
-          onChange(next);
-        });
-      });
-      map.addListener("click", (e: { latLng?: { lat: () => number; lng: () => number } }) => {
-        if (!e.latLng) return;
-        const lat = e.latLng.lat(); const lng = e.latLng.lng();
-        marker.setPosition({ lat, lng });
-        reverseGeocode(lat, lng).then((addr) => {
-          if (inputRef.current) inputRef.current.value = addr;
-          onChange({ address: addr, lat, lng });
-        });
-      });
-
-      // Places Autocomplete on the input
-      if (inputRef.current) {
-        const ac = new g.maps.places.Autocomplete(inputRef.current, {
-          fields: ["formatted_address", "geometry"],
-          componentRestrictions: { country: "ke" },
-        });
-        ac.bindTo("bounds", map);
-        ac.addListener("place_changed", () => {
-          const place = ac.getPlace();
-          if (!place.geometry?.location) return;
-          const lat = place.geometry.location.lat();
-          const lng = place.geometry.location.lng();
-          const address = place.formatted_address || inputRef.current!.value;
-          map.setCenter({ lat, lng }); map.setZoom(16);
-          marker.setPosition({ lat, lng });
-          onChange({ address, lat, lng });
-        });
-      }
-      setReady(true);
-    }).catch((e) => setError(e.message || "Map failed to load"));
-    return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [apiKey]);
-
-  async function reverseGeocode(lat: number, lng: number): Promise<string> {
-    return new Promise((resolve) => {
-      const g = window.google;
-      if (!g?.maps) return resolve(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-      const geocoder = new g.maps.Geocoder();
-      geocoder.geocode({ location: { lat, lng } }, (results: Array<{ formatted_address: string }> | null, status: string) => {
-        if (status === "OK" && results && results[0]) resolve(results[0].formatted_address);
-        else resolve(`${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-      });
-    });
-  }
-
-  function useMyLocation() {
-    if (!navigator.geolocation) { setError("Geolocation not supported"); return; }
-    setLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const lat = pos.coords.latitude; const lng = pos.coords.longitude;
-        mapRef.current?.setCenter({ lat, lng });
-        mapRef.current?.setZoom(16);
-        markerRef.current?.setPosition({ lat, lng });
-        const addr = await reverseGeocode(lat, lng);
-        if (inputRef.current) inputRef.current.value = addr;
-        onChange({ address: addr, lat, lng });
-        setLocating(false);
-      },
-      (err) => { setError(err.message); setLocating(false); },
-      { enableHighAccuracy: true, timeout: 10_000 },
-    );
-  }
+  const geocodeAbort = useRef<AbortController | null>(null);
 
   const online = useOnline();
+
+  const applyPosition = useCallback(
+    (pos: LatLng, opts?: { addressOverride?: string }) => {
+      setPin(pos);
+      setConfirmed(false);
+      setResults([]);
+      // Invalidate any previously confirmed location on the parent immediately — the customer
+      // must explicitly re-confirm before this new pin position can be submitted with the order.
+      onChange(null);
+      if (opts?.addressOverride) {
+        setAddress(opts.addressOverride);
+        setQuery(opts.addressOverride);
+        return;
+      }
+      geocodeAbort.current?.abort();
+      const controller = new AbortController();
+      geocodeAbort.current = controller;
+      setAddressLoading(true);
+      setError(null);
+      reverseGeocode(pos, controller.signal)
+        .then((addr) => {
+          setAddress(addr);
+          setQuery(addr);
+        })
+        .catch((e) => {
+          if (e instanceof DOMException && e.name === "AbortError") return;
+          // Fall back to raw coordinates — the customer can still type an address manually.
+          const fallback = `${pos.lat.toFixed(5)}, ${pos.lng.toFixed(5)}`;
+          setAddress(fallback);
+          setQuery(fallback);
+          setError("Couldn't look up an address for this spot — you can type one in manually.");
+        })
+        .finally(() => setAddressLoading(false));
+    },
+    [onChange],
+  );
+
+  const handleSearch = async () => {
+    if (!query.trim() || query.trim().length < 3) return;
+    setSearching(true);
+    setError(null);
+    try {
+      const res = await searchAddress(query.trim());
+      if (res.length === 0) {
+        setError("No matches found. Try a different search or drop the pin manually.");
+        setResults([]);
+      } else {
+        setResults(res);
+      }
+    } catch {
+      setError("Search failed. Check your connection and try again.");
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const pickResult = (r: NominatimResult) => {
+    const pos = { lat: parseFloat(r.lat), lng: parseFloat(r.lon) };
+    applyPosition(pos, { addressOverride: r.display_name });
+    setFlyCenter(pos);
+    setFlyToken((t) => t + 1);
+    setResults([]);
+  };
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation isn't supported by this browser. Please drop the pin manually.");
+      return;
+    }
+    setLocating(true);
+    setError(null);
+    navigator.geolocation.getCurrentPosition(
+      (posResult) => {
+        const pos = { lat: posResult.coords.latitude, lng: posResult.coords.longitude };
+        applyPosition(pos);
+        setFlyCenter(pos);
+        setFlyToken((t) => t + 1);
+        setLocating(false);
+      },
+      (err) => {
+        setLocating(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setError(
+            "Location permission denied — no problem, just drop the pin on the map manually.",
+          );
+        } else {
+          setError("Couldn't get your current location. Please drop the pin manually.");
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10_000 },
+    );
+  };
+
+  const confirmLocation = () => {
+    if (!pin) return;
+    setConfirmed(true);
+    onChange({
+      address: address.trim() || `${pin.lat.toFixed(5)}, ${pin.lng.toFixed(5)}`,
+      lat: pin.lat,
+      lng: pin.lng,
+      landmark: landmark.trim() || undefined,
+      instructions: instructions.trim() || undefined,
+    });
+  };
+
+  // Landmark/instructions are free text unrelated to the pin — sync them straight through
+  // once a location is already confirmed, no need to re-confirm the position for these.
+  useEffect(() => {
+    if (!confirmed || !pin) return;
+    onChange({
+      address: address.trim() || `${pin.lat.toFixed(5)}, ${pin.lng.toFixed(5)}`,
+      lat: pin.lat,
+      lng: pin.lng,
+      landmark: landmark.trim() || undefined,
+      instructions: instructions.trim() || undefined,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [landmark, instructions]);
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs text-muted-foreground">Serving all of Kenya — pin any address.</p>
+        <p className="text-sm font-medium">📍 Select your delivery location</p>
         <span
           className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium ${
             online ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"
@@ -164,35 +199,156 @@ export function DeliveryMap({ value, onChange }: Props) {
           {online ? "Online" : "Offline"}
         </span>
       </div>
+      <p className="text-xs text-muted-foreground">Move the pin to your exact delivery location.</p>
+
       <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
         <div className="relative">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            ref={inputRef}
-            defaultValue={value?.address ?? ""}
-            placeholder="Search for your address in Kenya…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSearch();
+              }
+            }}
+            placeholder="Search for your area (e.g. Ruiru, Kiambu)…"
             className="pl-9"
             autoComplete="off"
           />
+          {results.length > 0 && (
+            <ul className="absolute z-[1000] mt-1 w-full overflow-hidden rounded-xl border border-border bg-popover shadow-lg">
+              {results.map((r, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    onClick={() => pickResult(r)}
+                    className="block w-full truncate px-3 py-2 text-left text-sm hover:bg-muted"
+                  >
+                    {r.display_name}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <Button type="button" variant="outline" onClick={useMyLocation} disabled={locating || !ready} className="rounded-full">
-          {locating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LocateFixed className="mr-2 h-4 w-4" />}
-          Use my location
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleSearch}
+            disabled={searching || query.trim().length < 3}
+            className="rounded-full"
+          >
+            {searching ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+            <span className="ml-1.5 hidden sm:inline">Search</span>
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={useMyLocation}
+            disabled={locating}
+            className="rounded-full"
+          >
+            {locating ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <LocateFixed className="h-4 w-4" />
+            )}
+            <span className="ml-1.5 hidden sm:inline">Use my location</span>
+          </Button>
+        </div>
       </div>
-      <div
-        ref={containerRef}
-        className="h-[320px] w-full overflow-hidden rounded-2xl border border-border bg-muted"
-        aria-label="Delivery location map"
-      />
-      {value && (
-        <p className="flex items-start gap-2 rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
-          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-          <span><span className="font-medium text-foreground">Pinned:</span> {value.address} ({value.lat.toFixed(5)}, {value.lng.toFixed(5)}). Drag the pin or click the map to adjust.</span>
+
+      <ClientOnly fallback={<MapSkeleton />}>
+        <Suspense fallback={<MapSkeleton />}>
+          <div className="h-[320px] w-full overflow-hidden rounded-2xl border border-border sm:h-[380px]">
+            <LeafletMap
+              center={flyCenter}
+              zoom={pin ? 15 : 12}
+              marker={pin}
+              onPositionChange={applyPosition}
+              flyToToken={flyToken}
+            />
+          </div>
+        </Suspense>
+      </ClientOnly>
+
+      {pin && (
+        <div className="space-y-3 rounded-2xl bg-muted/50 p-3">
+          <p className="flex items-start gap-2 text-xs text-muted-foreground">
+            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+            <span>
+              <span className="font-medium text-foreground">Selected:</span>{" "}
+              {addressLoading ? "Looking up address…" : address} ({pin.lat.toFixed(5)},{" "}
+              {pin.lng.toFixed(5)})
+            </span>
+          </p>
+          {confirmed ? (
+            <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-700">
+              <CheckCircle2 className="h-3.5 w-3.5" /> Location confirmed
+            </p>
+          ) : (
+            <Button
+              type="button"
+              size="sm"
+              onClick={confirmLocation}
+              disabled={addressLoading}
+              className="rounded-full"
+            >
+              <CheckCircle2 className="mr-1.5 h-4 w-4" /> Confirm Location
+            </Button>
+          )}
+        </div>
+      )}
+      {!pin && (
+        <p className="text-xs text-muted-foreground">
+          Tap the map, search above, or use your current location to drop a pin.
         </p>
       )}
-      {error && <p className="text-xs text-destructive">{error}</p>}
-      {!ready && !error && <p className="text-xs text-muted-foreground">Loading map…</p>}
+
+      {error && (
+        <p className="text-xs text-destructive" role="alert">
+          {error}
+        </p>
+      )}
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-1.5">
+          <Label htmlFor="landmark">Landmark (optional)</Label>
+          <Input
+            id="landmark"
+            value={landmark}
+            onChange={(e) => setLandmark(e.target.value)}
+            placeholder="e.g. Near Quickmart"
+          />
+        </div>
+        <div className="grid gap-1.5">
+          <Label htmlFor="delivery-instructions">Delivery instructions (optional)</Label>
+          <Textarea
+            id="delivery-instructions"
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            placeholder="e.g. Call when you arrive, gate code, preferred time…"
+            rows={1}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MapSkeleton() {
+  return (
+    <div className="flex h-[320px] w-full items-center justify-center rounded-2xl border border-border bg-muted sm:h-[380px]">
+      <p className="flex items-center gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Loading map…
+      </p>
     </div>
   );
 }
