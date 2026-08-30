@@ -55,6 +55,7 @@ export const branches: BranchInfo[] = [
   {
     slug: "marurui",
     name: "Marurui",
+    pickupLabel: "Marurui, Ruaka, Two Rivers",
     blurb: "Water and gas service point.",
     available: "Water refills, bottled water, 6kg gas, 13kg gas",
     serves: "Thome, Ridgeways and its environs",
@@ -108,6 +109,7 @@ export const branches: BranchInfo[] = [
   {
     slug: "tinganga",
     name: "Ting'ang'a",
+    pickupLabel: "Ting'ang'a, Kiambu",
     blurb: "Shop location for water and gas enquiries.",
     available: "Water refills, bottled water, 6kg gas, 13kg gas",
     serves: "Kiambu, Githunguri and its environs",
