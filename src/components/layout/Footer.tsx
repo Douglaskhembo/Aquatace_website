@@ -43,7 +43,7 @@ export function Footer() {
                     params={{ slug: b.slug }}
                     className="hover:text-foreground"
                   >
-                    {b.name}
+                    {b.pickupLabel ?? b.name}
                   </Link>
                   <a href={b.phoneHref} className="text-xs tabular-nums hover:text-foreground">
                     {b.phone}

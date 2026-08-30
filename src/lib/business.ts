@@ -30,6 +30,10 @@ export const business = {
 export type BranchInfo = {
   slug: string;
   name: string;
+  /** Overrides `name` only in the footer's Pickup Points list, for a branch that
+   * covers several named areas on one phone line (e.g. Membley/OJ/Tatu City/
+   * Kahawa West/Ruiru all route through the Membley contact). */
+  pickupLabel?: string;
   blurb: string;
   available: string;
   serves: string;
@@ -85,6 +89,7 @@ export const branches: BranchInfo[] = [
   {
     slug: "membley",
     name: "Membley",
+    pickupLabel: "Membley, OJ, Tatu City, Kahawa West, Ruiru",
     blurb: "Branch serving customers around Membley. Main contact for the featured offer.",
     available: "Gas supply and selected water products",
     serves: "Membley and its environs",
