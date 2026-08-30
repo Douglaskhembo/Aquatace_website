@@ -34,11 +34,20 @@ function toGalleryImage(row: GalleryRow): GalleryImage {
 
 const GALLERY_SELECT = "id, image_url, image_path, alt_text, caption, sort_order";
 
+// Public gallery shows curated photos plus every in-stock product's photo, so
+// admins don't have to re-upload product images separately. The admin Gallery
+// panel (below) only manages the curated set — deleting there shouldn't touch
+// product rows.
 export const listGalleryImages = createServerFn({ method: "GET" }).handler(
   async (): Promise<GalleryImage[]> => {
     const db = getDb();
     const { rows } = await db.query<GalleryRow>(
-      `SELECT ${GALLERY_SELECT} FROM gallery_images ORDER BY sort_order`,
+      `SELECT ${GALLERY_SELECT} FROM gallery_images
+       UNION ALL
+       SELECT id, image_url, image_path, name AS alt_text, NULL::text AS caption, sort_order
+       FROM products
+       WHERE image_url IS NOT NULL AND in_stock = true
+       ORDER BY sort_order`,
     );
     return rows.map(toGalleryImage);
   },
