@@ -72,6 +72,7 @@ export const branches: BranchInfo[] = [
   {
     slug: "kihunguro",
     name: "Kihunguro",
+    pickupLabel: "Kihunguro, Kamakis, Juja, Thika Road, KU, Kasarani",
     blurb: "Water and gas service point.",
     available: "Water refills, bottled water, 6kg gas, 13kg gas",
     serves: "Kamakis, Thika Super Highway and its environs",
