@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+    container_name: aquatace-app
+    restart: unless-stopped
+    # Host networking so the container can reach the VPS's native Postgres on
+    # localhost:5432 without any extra network wiring, and so a host-level
+    # reverse proxy (Caddy/nginx) can reach it on localhost:3000.
+    network_mode: host
+    env_file: .env
+    volumes:
+      - uploads_data:/app/uploads
+
+volumes:
+  uploads_data:

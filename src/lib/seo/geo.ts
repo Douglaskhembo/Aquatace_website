@@ -1,7 +1,7 @@
 // Local-SEO content data: real service areas and counties around Aquatace's four
 // physical branches (see `branches` in @/lib/business). This is presentation/content
 // data only — it never feeds order routing or delivery-fee logic, which continues to
-// live in orders.functions.ts against the Supabase `branches` table.
+// live in orders.functions.ts against the `branches` table.
 //
 // Every area listed here is a place Aquatace genuinely delivers to or near. Areas the
 // business hasn't confirmed coverage for are deliberately left out rather than guessed.

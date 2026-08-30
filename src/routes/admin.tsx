@@ -5,8 +5,8 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import type { Session } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { getCurrentAdmin } from "@/lib/auth.functions";
+import { getStoredToken, clearStoredToken } from "@/lib/auth-client";
 import { uploadMedia, removeMedia } from "@/lib/storage";
 import { categories, formatKES, type Product } from "@/lib/products";
 import { adminListProducts, createProduct, updateProduct, deleteProduct } from "@/lib/products.functions";
@@ -50,26 +50,35 @@ export const Route = createFileRoute("/admin")({
 
 function AdminPage() {
   const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null | undefined>(undefined);
+  const [authed, setAuthed] = useState<boolean | undefined>(undefined);
   const routerState = useRouterState();
   const isLoginPage = routerState.location.pathname === '/admin/login';
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => setSession(s));
-    return () => sub.subscription.unsubscribe();
+    if (!getStoredToken()) {
+      setAuthed(false);
+      return;
+    }
+    getCurrentAdmin()
+      .then((admin) => setAuthed(!!admin))
+      .catch(() => setAuthed(false));
   }, []);
 
   useEffect(() => {
-    if (session === null && !isLoginPage) navigate({ to: "/admin/login" });
-  }, [session, navigate, isLoginPage]);
+    if (authed === false && !isLoginPage) navigate({ to: "/admin/login" });
+  }, [authed, navigate, isLoginPage]);
 
   if (isLoginPage) return <Outlet />;
 
-  if (session === undefined) {
+  if (authed === undefined) {
     return <div className="container-page py-24 text-center text-muted-foreground">Loading…</div>;
   }
-  if (!session) return null;
+  if (!authed) return null;
+
+  function signOut() {
+    clearStoredToken();
+    navigate({ to: "/admin/login" });
+  }
 
   return (
     <div className="container-page py-10">
@@ -78,7 +87,7 @@ function AdminPage() {
           <p className="text-xs font-semibold uppercase tracking-widest text-primary">Admin</p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight">Manage catalog</h1>
         </div>
-        <Button variant="outline" className="rounded-full" onClick={() => supabase.auth.signOut()}>
+        <Button variant="outline" className="rounded-full" onClick={signOut}>
           <LogOut className="mr-2 h-4 w-4" /> Sign out
         </Button>
       </div>

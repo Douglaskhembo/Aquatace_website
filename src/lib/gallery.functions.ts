@@ -1,9 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireAdminRole } from "@/lib/admin-middleware";
-
-const GALLERY_COLUMNS = "id,image_url,image_path,alt_text,caption,sort_order";
+import { getDb } from "./db.server";
 
 export interface GalleryImage {
   id: string;
@@ -34,31 +32,26 @@ function toGalleryImage(row: GalleryRow): GalleryImage {
   };
 }
 
-function anonClient() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-}
+const GALLERY_SELECT = "id, image_url, image_path, alt_text, caption, sort_order";
 
 export const listGalleryImages = createServerFn({ method: "GET" }).handler(
   async (): Promise<GalleryImage[]> => {
-    const supa = anonClient();
-    const { data, error } = await supa.from("gallery_images").select(GALLERY_COLUMNS).order("sort_order");
-    if (error) throw new Error(error.message);
-    return ((data ?? []) as GalleryRow[]).map(toGalleryImage);
+    const db = getDb();
+    const { rows } = await db.query<GalleryRow>(
+      `SELECT ${GALLERY_SELECT} FROM gallery_images ORDER BY sort_order`,
+    );
+    return rows.map(toGalleryImage);
   },
 );
 
 export const adminListGalleryImages = createServerFn({ method: "GET" })
   .middleware([requireAdminRole])
   .handler(async (): Promise<GalleryImage[]> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data, error } = await supabaseAdmin
-      .from("gallery_images")
-      .select(GALLERY_COLUMNS)
-      .order("sort_order");
-    if (error) throw new Error(error.message);
-    return ((data ?? []) as GalleryRow[]).map(toGalleryImage);
+    const db = getDb();
+    const { rows } = await db.query<GalleryRow>(
+      `SELECT ${GALLERY_SELECT} FROM gallery_images ORDER BY sort_order`,
+    );
+    return rows.map(toGalleryImage);
   });
 
 const GalleryInputSchema = z.object({
@@ -73,34 +66,24 @@ export const createGalleryImage = createServerFn({ method: "POST" })
   .middleware([requireAdminRole])
   .inputValidator((input: unknown) => GalleryInputSchema.parse(input))
   .handler(async ({ data }): Promise<GalleryImage> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin
-      .from("gallery_images")
-      .insert({
-        image_url: data.imageUrl,
-        image_path: data.imagePath || null,
-        alt_text: data.altText,
-        caption: data.caption || null,
-        sort_order: data.sortOrder,
-      })
-      .select(GALLERY_COLUMNS)
-      .single();
-    if (error) throw new Error(error.message);
-    return toGalleryImage(row as GalleryRow);
+    const db = getDb();
+    const { rows } = await db.query<GalleryRow>(
+      `INSERT INTO gallery_images (image_url, image_path, alt_text, caption, sort_order)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING ${GALLERY_SELECT}`,
+      [data.imageUrl, data.imagePath || null, data.altText, data.caption || null, data.sortOrder],
+    );
+    return toGalleryImage(rows[0]);
   });
 
 export const deleteGalleryImage = createServerFn({ method: "POST" })
   .middleware([requireAdminRole])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data }): Promise<{ imagePath: string | null }> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error: selErr } = await supabaseAdmin
-      .from("gallery_images")
-      .select("image_path")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (selErr) throw new Error(selErr.message);
-    const { error } = await supabaseAdmin.from("gallery_images").delete().eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { imagePath: row?.image_path ?? null };
+    const db = getDb();
+    const { rows } = await db.query<{ image_path: string | null }>(
+      `DELETE FROM gallery_images WHERE id = $1 RETURNING image_path`,
+      [data.id],
+    );
+    return { imagePath: rows[0]?.image_path ?? null };
   });

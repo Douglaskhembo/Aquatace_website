@@ -1,14 +1,19 @@
 import { createMiddleware } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { getRequest } from "@tanstack/react-start/server";
+import { verifyAdminToken } from "./auth.server";
 
-export const requireAdminRole = createMiddleware({ type: "function" })
-  .middleware([requireSupabaseAuth])
-  .server(async ({ next, context }) => {
-    const { data, error } = await context.supabase.rpc("has_role", {
-      uid: context.userId,
-      check_role: "admin",
-    });
-    if (error) throw new Error(error.message);
-    if (!data) throw new Error("Forbidden: admin role required");
-    return next();
-  });
+export const requireAdminRole = createMiddleware({ type: "function" }).server(async ({ next }) => {
+  const request = getRequest();
+  const authHeader = request?.headers.get("authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new Error("Unauthorized: No authorization header provided");
+  }
+
+  const token = authHeader.slice("Bearer ".length);
+  const claims = await verifyAdminToken(token);
+  if (!claims) {
+    throw new Error("Unauthorized: Invalid or expired token");
+  }
+
+  return next({ context: { userId: claims.sub, email: claims.email } });
+});

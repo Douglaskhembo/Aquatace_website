@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { getDb } from "./db.server";
 
 const CartLineSchema = z.object({
   product_id: z.string().min(1).max(100),
@@ -33,21 +34,29 @@ const CreateOrderSchema = z.object({
   branch_override_id: z.string().uuid().optional(),
 });
 
+interface BranchRow {
+  id: string;
+  name: string;
+  area: string | null;
+  latitude: number;
+  longitude: number;
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  offer_note?: string | null;
+}
+
+const ACTIVE_BRANCHES_SQL = `SELECT id, name, area, latitude, longitude, phone, whatsapp, email, offer_note
+  FROM branches WHERE active = true`;
+
 export const assignNearestBranch = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z.object({ lat: z.number().gte(-90).lte(90), lng: z.number().gte(-180).lte(180) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
     const { haversineKm } = await import("./haversine");
-    const supa = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-    const { data: branches, error } = await supa
-      .from("branches")
-      .select("id,name,area,latitude,longitude,phone,whatsapp,email,offer_note")
-      .eq("active", true);
-    if (error) throw new Error(error.message);
+    const db = getDb();
+    const { rows: branches } = await db.query<BranchRow>(ACTIVE_BRANCHES_SQL);
     if (!branches || branches.length === 0) throw new Error("No active branches available.");
 
     // Try Google Routes API compute matrix
@@ -155,15 +164,11 @@ function generateOrderNumber(): string {
 export const createOrder = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => CreateOrderSchema.parse(input))
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { haversineKm } = await import("./haversine");
-
-    // Fetch branches (server side, trusted)
-    const { data: branches, error: bErr } = await supabaseAdmin
-      .from("branches")
-      .select("id,name,area,latitude,longitude,phone,whatsapp,email")
-      .eq("active", true);
-    if (bErr) throw new Error(bErr.message);
+    const pool = getDb();
+    const { rows: branches } = await pool.query<BranchRow>(
+      `SELECT id, name, area, latitude, longitude, phone, whatsapp, email FROM branches WHERE active = true`,
+    );
     if (!branches || branches.length === 0) throw new Error("No branches available.");
 
     // Determine assigned branch
@@ -249,40 +254,59 @@ export const createOrder = createServerFn({ method: "POST" })
     const subtotal = data.items.reduce((n, i) => n + i.unit_price_kes * i.quantity, 0);
     const orderNumber = generateOrderNumber();
 
-    const { data: order, error: oErr } = await supabaseAdmin
-      .from("orders")
-      .insert({
-        order_number: orderNumber,
-        customer_name: data.customer.name,
-        customer_phone: data.customer.phone,
-        customer_email: data.customer.email || null,
-        delivery_address: data.delivery.address,
-        delivery_lat: data.delivery.lat,
-        delivery_lng: data.delivery.lng,
-        delivery_landmark: data.delivery.landmark || null,
-        delivery_notes: data.notes || null,
-        assigned_branch_id: assigned.id,
-        estimated_distance_km: Math.round(bestKm * 10) / 10,
-        estimated_duration_min: durationMin,
-        subtotal_kes: subtotal,
-        total_kes: subtotal,
-        delivery_status: "pending",
-      })
-      .select("id,order_number")
-      .single();
-    if (oErr) throw new Error(oErr.message);
+    const client = await pool.connect();
+    let orderId: string;
+    try {
+      await client.query("BEGIN");
+      const { rows: orderRows } = await client.query<{ id: string; order_number: string }>(
+        `INSERT INTO orders
+          (order_number, customer_name, customer_phone, customer_email, delivery_address,
+           delivery_lat, delivery_lng, delivery_landmark, delivery_notes, assigned_branch_id,
+           estimated_distance_km, estimated_duration_min, subtotal_kes, total_kes, delivery_status)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,'pending')
+         RETURNING id, order_number`,
+        [
+          orderNumber,
+          data.customer.name,
+          data.customer.phone,
+          data.customer.email || null,
+          data.delivery.address,
+          data.delivery.lat,
+          data.delivery.lng,
+          data.delivery.landmark || null,
+          data.notes || null,
+          assigned.id,
+          Math.round(bestKm * 10) / 10,
+          durationMin,
+          subtotal,
+          subtotal,
+        ],
+      );
+      orderId = orderRows[0].id;
 
-    const itemsPayload = data.items.map((i) => ({
-      order_id: order.id,
-      product_id: i.product_id,
-      product_name: i.product_name,
-      category: i.category ?? null,
-      unit_price_kes: i.unit_price_kes,
-      quantity: i.quantity,
-      subtotal_kes: i.unit_price_kes * i.quantity,
-    }));
-    const { error: iErr } = await supabaseAdmin.from("order_items").insert(itemsPayload);
-    if (iErr) throw new Error(iErr.message);
+      for (const item of data.items) {
+        await client.query(
+          `INSERT INTO order_items
+            (order_id, product_id, product_name, category, unit_price_kes, quantity, subtotal_kes)
+           VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+          [
+            orderId,
+            item.product_id,
+            item.product_name,
+            item.category ?? null,
+            item.unit_price_kes,
+            item.quantity,
+            item.unit_price_kes * item.quantity,
+          ],
+        );
+      }
+      await client.query("COMMIT");
+    } catch (e) {
+      await client.query("ROLLBACK");
+      throw e;
+    } finally {
+      client.release();
+    }
 
     // Fire notifications (best-effort, non-blocking behavior)
     try {
@@ -317,27 +341,29 @@ export const getOrderByNumber = createServerFn({ method: "GET" })
     z.object({ order_number: z.string().min(6).max(50) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: order, error } = await supabaseAdmin
-      .from("orders")
-      .select(
-        "id,order_number,customer_name,customer_phone,customer_email,delivery_address,delivery_lat,delivery_lng,delivery_landmark,delivery_notes,estimated_distance_km,estimated_duration_min,subtotal_kes,total_kes,delivery_status,created_at,assigned_branch_id",
-      )
-      .eq("order_number", data.order_number)
-      .maybeSingle();
-    if (error) throw new Error(error.message);
+    const db = getDb();
+    const { rows: orderRows } = await db.query(
+      `SELECT id, order_number, customer_name, customer_phone, customer_email, delivery_address,
+              delivery_lat, delivery_lng, delivery_landmark, delivery_notes, estimated_distance_km,
+              estimated_duration_min, subtotal_kes, total_kes, delivery_status, created_at,
+              assigned_branch_id
+       FROM orders WHERE order_number = $1`,
+      [data.order_number],
+    );
+    const order = orderRows[0];
     if (!order) return null;
 
-    const [{ data: branch }, { data: items }] = await Promise.all([
-      supabaseAdmin
-        .from("branches")
-        .select("id,name,area,phone,whatsapp,email,latitude,longitude,opening_hours")
-        .eq("id", order.assigned_branch_id!)
-        .maybeSingle(),
-      supabaseAdmin
-        .from("order_items")
-        .select("product_name,quantity,unit_price_kes,subtotal_kes")
-        .eq("order_id", order.id),
+    const [{ rows: branchRows }, { rows: items }] = await Promise.all([
+      db.query(
+        `SELECT id, name, area, phone, whatsapp, email, latitude, longitude, opening_hours
+         FROM branches WHERE id = $1`,
+        [order.assigned_branch_id],
+      ),
+      db.query(
+        `SELECT product_name, quantity, unit_price_kes, subtotal_kes
+         FROM order_items WHERE order_id = $1`,
+        [order.id],
+      ),
     ]);
-    return { order, branch, items: items ?? [] };
+    return { order, branch: branchRows[0] ?? null, items: items ?? [] };
   });

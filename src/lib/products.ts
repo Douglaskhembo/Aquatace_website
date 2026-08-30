@@ -22,7 +22,7 @@ export interface Product {
   featured?: boolean;
   badge?: string;
   image?: string;
-  imagePath?: string; // Supabase Storage object path, used to clean up on delete
+  imagePath?: string; // uploaded media object path, used to clean up on delete
   active: boolean;
   sortOrder: number;
 }

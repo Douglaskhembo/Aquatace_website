@@ -34,3 +34,7 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+# Contains real customer data pulled from the live Supabase project — transfer
+# to the VPS out-of-band (scp), never commit.
+db/data_dump.sql

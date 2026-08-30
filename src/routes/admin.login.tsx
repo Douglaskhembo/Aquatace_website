@@ -4,7 +4,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { login } from "@/lib/auth.functions";
+import { setStoredToken } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,13 +33,15 @@ function AdminLoginPage() {
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
     setSubmitting(true);
-    const { error } = await supabase.auth.signInWithPassword(values);
-    setSubmitting(false);
-    if (error) {
-      toast.error("Sign in failed", { description: error.message });
-      return;
+    try {
+      const { token } = await login({ data: values });
+      setStoredToken(token);
+      navigate({ to: "/admin" });
+    } catch (e) {
+      toast.error("Sign in failed", { description: e instanceof Error ? e.message : String(e) });
+    } finally {
+      setSubmitting(false);
     }
-    navigate({ to: "/admin" });
   }
 
   return (

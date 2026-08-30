@@ -82,27 +82,9 @@ async function enqueueEmail(payload: {
   idempotencyKey: string;
 }): Promise<void> {
   if (!payload.recipientEmail) return;
-  // Attempt to enqueue via Supabase RPC (set up by email_domain--setup_email_infra).
-  // If infra isn't set up yet, this fails gracefully.
-  try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // enqueue_email RPC is added by email_domain--setup_email_infra; cast until then.
-    const rpc = supabaseAdmin.rpc as unknown as (
-      fn: string,
-      args: unknown,
-    ) => Promise<{ error: { message: string } | null }>;
-    const { error } = await rpc("enqueue_email", {
-      queue_name: "transactional_emails",
-      payload: {
-        template_name: payload.templateName,
-        recipient_email: payload.recipientEmail,
-        subject: payload.subject,
-        template_data: payload.templateData,
-        idempotency_key: payload.idempotencyKey,
-      },
-    });
-    if (error) console.warn("enqueue_email error:", error.message);
-  } catch (e) {
-    console.warn("email infra not ready", e);
-  }
+  // The previous email pathway (Lovable Cloud's transactional email queue, backed by
+  // Supabase) no longer exists post-migration. No SMTP replacement is configured yet,
+  // so this is a no-op — order creation still succeeds, it just doesn't email anyone.
+  // Wire up real delivery here (e.g. nodemailer + SMTP_* env vars) when needed.
+  console.warn(`[email skipped] ${payload.templateName} -> ${payload.recipientEmail}`);
 }
