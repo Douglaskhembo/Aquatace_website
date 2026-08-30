@@ -37,7 +37,7 @@ export function Footer() {
             <h3 className="text-sm font-semibold">Pickup Points</h3>
             <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
               {branches.map((b) => (
-                <li key={b.slug} className="flex items-start justify-between gap-2">
+                <li key={b.slug} className="flex flex-col gap-1">
                   <Link
                     to="/branches/$slug"
                     params={{ slug: b.slug }}
@@ -45,7 +45,10 @@ export function Footer() {
                   >
                     {b.pickupLabel ?? b.name}
                   </Link>
-                  <a href={b.phoneHref} className="text-xs tabular-nums hover:text-foreground">
+                  <a
+                    href={b.phoneHref}
+                    className="whitespace-nowrap text-xs tabular-nums hover:text-foreground"
+                  >
                     {b.phone}
                   </a>
                 </li>
