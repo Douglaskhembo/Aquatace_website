@@ -29,6 +29,15 @@ const EVENT_TYPES = [
 
 const SIZES = ["500ml", "1L", "10L", "20L"] as const;
 
+const HERO_TILES = [
+  { label: "Wedding", image: "/custom-water/wedding.jpg" },
+  { label: "Corporate", image: "/custom-water/corporate.jpg" },
+  { label: "Memorial", image: "/custom-water/memorial.jpg" },
+  { label: "Birthday", image: "/custom-water/birthday.jpg" },
+  { label: "Church", image: undefined },
+  { label: "Graduation", image: "/custom-water/graduation.jpg" },
+] as const;
+
 function CustomWaterPage() {
   const [eventType, setEventType] = useState<string>("wedding");
   const [size, setSize] = useState<(typeof SIZES)[number]>("500ml");
@@ -79,10 +88,17 @@ function CustomWaterPage() {
           <div className="md:col-span-5">
             <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
               <div className="absolute inset-0 grid grid-cols-3 gap-2 p-4">
-                {["Wedding", "Corporate", "Memorial", "Birthday", "Church", "Graduation"].map((t) => (
-                  <div key={t} className="flex flex-col items-center justify-end rounded-2xl bg-white/15 p-2 text-[10px] font-semibold uppercase tracking-widest">
-                    <Droplet className="mb-2 h-8 w-8" />
-                    <span className="text-center leading-tight">{t}</span>
+                {HERO_TILES.map((t) => (
+                  <div key={t.label} className="relative flex flex-col items-center justify-end overflow-hidden rounded-2xl bg-white/15 p-2 text-[10px] font-semibold uppercase tracking-widest">
+                    {t.image ? (
+                      <>
+                        <img src={t.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                      </>
+                    ) : (
+                      <Droplet className="relative mb-2 h-8 w-8" />
+                    )}
+                    <span className="relative text-center leading-tight text-white drop-shadow">{t.label}</span>
                   </div>
                 ))}
               </div>
