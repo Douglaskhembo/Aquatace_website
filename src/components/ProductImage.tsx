@@ -30,7 +30,7 @@ export function ProductImage({
   if (image) {
 
     return (
-      <div className={`relative overflow-hidden ${grad} ${className}`}>
+      <div className={`relative overflow-hidden ${imageOverride ? "bg-muted" : grad} ${className}`}>
         <img
           src={image}
           alt={label ?? "Product image"}
@@ -40,7 +40,13 @@ export function ProductImage({
         />
 
         {label && (
-          <div className="absolute bottom-3 left-3 right-3 truncate text-xs font-medium uppercase tracking-wider text-white/85">
+          <div
+            className={
+              imageOverride
+                ? "absolute bottom-3 left-3 right-3 truncate rounded-full bg-foreground/80 px-2 py-1 text-center text-[10px] font-medium uppercase tracking-wider text-white"
+                : "absolute bottom-3 left-3 right-3 truncate text-xs font-medium uppercase tracking-wider text-white/85"
+            }
+          >
             {label}
           </div>
         )}
