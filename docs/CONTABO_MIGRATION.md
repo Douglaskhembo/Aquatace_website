@@ -117,16 +117,27 @@ sudo apt install -y caddy
 `/etc/caddy/Caddyfile`:
 
 ```
+www.aquatace.co.ke {
+	redir https://aquatace.co.ke{uri} permanent
+}
+
 aquatace.co.ke {
-    reverse_proxy localhost:3000
+	reverse_proxy localhost:3000
 }
 ```
+
+The `www` block matters: without it, Caddy has no TLS certificate for
+`www.aquatace.co.ke`, so a browser hitting that host over HTTPS gets a
+connection error instead of the site — it looks like "the site doesn't load
+unless you type the exact URL". The redirect block fixes that and keeps
+`aquatace.co.ke` (no `www`) as the one canonical URL (matches `SITE_URL` in
+`src/lib/seo/config.ts`).
 
 ```bash
 sudo systemctl reload caddy
 ```
 
-Point `aquatace.co.ke`'s DNS A record at the VPS's IP.
+Point both `aquatace.co.ke` and `www.aquatace.co.ke` DNS records at the VPS's IP.
 
 ---
 
