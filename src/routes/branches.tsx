@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { MapPin, MessageCircle, PhoneCall, ArrowRight } from "lucide-react";
+import { MapPin, MessageCircle, PhoneCall, Navigation, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -117,6 +117,15 @@ function BranchesPage() {
                       <PhoneCall className="mr-2 h-4 w-4" /> Call
                     </a>
                   </Button>
+                  <Button asChild variant="outline" className="rounded-full">
+                    <a
+                      href={`https://www.google.com/maps?q=${b.latitude},${b.longitude}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      <Navigation className="mr-2 h-4 w-4" /> Directions
+                    </a>
+                  </Button>
                 </div>
                 <Link
                   to="/branches/$slug"
@@ -125,6 +134,14 @@ function BranchesPage() {
                 >
                   View branch details <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
+                <div className="mt-5 overflow-hidden rounded-2xl border border-border/60">
+                  <iframe
+                    title={`Map pin for Aquatace ${b.name}`}
+                    src={`https://www.google.com/maps?q=${b.latitude},${b.longitude}&output=embed`}
+                    className="h-40 w-full"
+                    loading="lazy"
+                  />
+                </div>
               </CardContent>
             </Card>
           </motion.div>
