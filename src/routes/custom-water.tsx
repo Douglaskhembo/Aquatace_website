@@ -34,7 +34,7 @@ const HERO_TILES = [
   { label: "Corporate", image: "/custom-water/corporate.jpg" },
   { label: "Memorial", image: "/custom-water/memorial.jpg" },
   { label: "Birthday", image: "/custom-water/birthday.jpg" },
-  { label: "Church", image: undefined },
+  { label: "Church", image: "/custom-water/church.jpg" },
   { label: "Graduation", image: "/custom-water/graduation.jpg" },
 ] as const;
 
