@@ -67,7 +67,7 @@ function ServiceAreaPage() {
           {area.corridorStops ? "Delivery corridor" : "Delivery area"}
         </p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-          Water, LPG Gas &amp; Electronics Delivery in {area.name}
+          Water Refill, Gas Supply &amp; Electronics Delivery in {area.name}
         </h1>
         <p className="mt-3 text-muted-foreground">{area.intro}</p>
       </div>

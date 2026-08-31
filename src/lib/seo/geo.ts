@@ -34,9 +34,9 @@ export const branchLocalContent: Record<string, BranchLocalContent> = {
     ],
     areaNote:
       "Marurui sits inside Kasarani, so this branch is usually the fastest for water and gas orders anywhere along the Kasarani side of Thika Road.",
-    seoTitle: "Aquatace Marurui — Water, LPG Gas & Delivery in Kasarani",
+    seoTitle: "Aquatace Marurui — Water & Gas Refill Supply in Kasarani",
     seoDescription:
-      "Order purified drinking water and LPG cooking gas from Aquatace's Marurui branch, serving Kasarani, Thome, Ridgeways, Roysambu and Zimmerman. Call or WhatsApp 0795 199 701.",
+      "Need gas refill or gas supply in Marurui? Order purified drinking water and LPG cooking gas refills from Aquatace's Marurui branch, serving Kasarani, Thome, Ridgeways, Roysambu and Zimmerman. Call or WhatsApp 0795 199 701.",
   },
   kihunguro: {
     nearbyAreas: [
@@ -52,9 +52,9 @@ export const branchLocalContent: Record<string, BranchLocalContent> = {
     ],
     areaNote:
       "Kihunguro sits right on the Thika Road/Ruiru corridor, putting most of Ruiru town and the Kahawa Sukari/Kahawa Wendani estates within easy reach.",
-    seoTitle: "Aquatace Kihunguro — Water & LPG Gas Delivery in Ruiru",
+    seoTitle: "Aquatace Kihunguro — Water & Gas Refill Supply in Ruiru",
     seoDescription:
-      "Aquatace's Kihunguro branch delivers water refills and LPG cooking gas across Ruiru, Kahawa Sukari, Kahawa Wendani and Kamakis. Call or WhatsApp 0713 727 229.",
+      "Need gas refill or gas supply in Ruiru? Aquatace's Kihunguro branch delivers water refills and LPG cooking gas across Ruiru, Kahawa Sukari, Kahawa Wendani and Kamakis. Call or WhatsApp 0713 727 229.",
   },
   membley: {
     nearbyAreas: [
@@ -75,9 +75,9 @@ export const branchLocalContent: Record<string, BranchLocalContent> = {
     ],
     areaNote:
       "Membley's position near Thika Road, Kenyatta University, Kamakis and Tatu City makes it our main coordination point for orders further out along this corridor — including nationwide dispatch outside our core Nairobi/Kiambu coverage.",
-    seoTitle: "Aquatace Membley — Water & Gas Delivery Near Kenyatta University",
+    seoTitle: "Aquatace Membley — Water & Gas Refill Supply Near Kenyatta University",
     seoDescription:
-      "Order water and LPG gas for delivery in Membley, Ruiru and nearby Tatu City and Kenyatta University from Aquatace. Call or WhatsApp 0707 201 072.",
+      "Need gas refill or gas supply in Membley? Order water and LPG gas refills for delivery in Membley, Ruiru and nearby Tatu City and Kenyatta University from Aquatace. Call or WhatsApp 0707 201 072.",
   },
   tinganga: {
     nearbyAreas: [
@@ -91,9 +91,9 @@ export const branchLocalContent: Record<string, BranchLocalContent> = {
     ],
     areaNote:
       "Ting'ang'a reaches Kiambu town and its immediate neighbourhoods — Ndumberi, Riabai, Kiambaa and Thindigua — and, depending on your exact location, as far as Ruaka, Karuri or Muchatha.",
-    seoTitle: "Aquatace Ting'ang'a — Water & Gas Delivery in Kiambu",
+    seoTitle: "Aquatace Ting'ang'a — Water & Gas Refill Supply in Kiambu",
     seoDescription:
-      "Aquatace's Ting'ang'a shop serves Kiambu town, Ndumberi, Riabai and Kiambaa with water refills and LPG cooking gas. Call or WhatsApp 0112 819 068.",
+      "Need gas refill or gas supply in Kiambu? Aquatace's Ting'ang'a shop serves Kiambu town, Ndumberi, Riabai and Kiambaa with water refills and LPG cooking gas. Call or WhatsApp 0112 819 068.",
   },
 };
 
@@ -131,9 +131,9 @@ export const serviceAreas: ServiceArea[] = [
     ],
     intro:
       "Aquatace's Marurui branch sits inside Kasarani, so water refill and cooking gas orders from Kasarani and its surrounding estates — Thome, Ridgeways, Mirema, Garden Estate, Roysambu, Zimmerman and Mwiki — are usually among the fastest we dispatch. Electronics and the rest of our online catalogue deliver here too, on the same WhatsApp order process as everywhere else we serve.",
-    seoTitle: "Water & LPG Gas Delivery in Kasarani, Nairobi | Aquatace",
+    seoTitle: "Gas Refill & Water Supply in Kasarani, Marurui | Aquatace",
     seoDescription:
-      "Order purified drinking water and LPG cooking gas for delivery in Kasarani, Thome, Ridgeways and Roysambu from Aquatace's Marurui branch. Order via WhatsApp.",
+      "Looking for gas refill or gas supply in Marurui or Kasarani? Order purified drinking water and LPG cooking gas for delivery in Kasarani, Thome, Ridgeways and Roysambu from Aquatace's Marurui branch. Order via WhatsApp.",
   },
   {
     slug: "ruiru",

@@ -75,7 +75,7 @@ function BranchDetailPage() {
           Aquatace pickup point
         </p>
         <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-          Aquatace {branch.name}
+          Water &amp; Gas Refill Supply — Aquatace {branch.name}
         </h1>
         <p className="mt-3 text-muted-foreground">
           Aquatace's {branch.name} branch serves customers in {branch.address} and the surrounding
