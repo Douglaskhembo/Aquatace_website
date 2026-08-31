@@ -26,11 +26,14 @@ export const branchLocalContent: Record<string, BranchLocalContent> = {
       "Ridgeways",
       "Mirema",
       "Garden Estate",
+      "Garden City",
       "Roysambu",
       "Zimmerman",
       "Githurai",
       "Mwiki",
       "Kahawa",
+      "Ruaka",
+      "Two Rivers",
     ],
     areaNote:
       "Marurui sits inside Kasarani, so this branch is usually the fastest for water and gas orders anywhere along the Kasarani side of Thika Road.",
@@ -49,6 +52,8 @@ export const branchLocalContent: Record<string, BranchLocalContent> = {
       "Kamakis",
       "Juja",
       "Thika Road",
+      "Kenyatta University",
+      "Kasarani",
     ],
     areaNote:
       "Kihunguro sits right on the Thika Road/Ruiru corridor, putting most of Ruiru town and the Kahawa Sukari/Kahawa Wendani estates within easy reach.",
@@ -72,6 +77,7 @@ export const branchLocalContent: Record<string, BranchLocalContent> = {
       "Kamakis",
       "Juja",
       "OJ",
+      "Kahawa West",
     ],
     areaNote:
       "Membley's position near Thika Road, Kenyatta University, Kamakis and Tatu City makes it our main coordination point for orders further out along this corridor — including nationwide dispatch outside our core Nairobi/Kiambu coverage.",

@@ -55,7 +55,7 @@ export const branches: BranchInfo[] = [
   {
     slug: "marurui",
     name: "Marurui",
-    pickupLabel: "Marurui, Ruaka, Two Rivers, Garden City, Roysambu",
+    pickupLabel: "Marurui, Ruaka, Two Rivers, Garden City, Roysambu, Thome",
     blurb: "Water and gas service point.",
     available: "Water refills, bottled water, 6kg gas, 13kg gas",
     serves: "Thome, Ridgeways and its environs",
@@ -109,7 +109,7 @@ export const branches: BranchInfo[] = [
   {
     slug: "tinganga",
     name: "Ting'ang'a",
-    pickupLabel: "Ting'ang'a, Kiambu, Thome",
+    pickupLabel: "Ting'ang'a, Kiambu, Githunguri",
     blurb: "Shop location for water and gas enquiries.",
     available: "Water refills, bottled water, 6kg gas, 13kg gas",
     serves: "Kiambu, Githunguri and its environs",
@@ -118,9 +118,9 @@ export const branches: BranchInfo[] = [
     whatsapp: "254112819068",
     offer: "Shop location — no current offer",
     county: "Kiambu",
-    address: "Ting'ang'a, Kiambu",
-    latitude: -1.155,
-    longitude: 36.81,
+    address: "VR95+VQR, Karia, Ting'ang'a, Kiambu",
+    latitude: -1.130262,
+    longitude: 36.809391,
     openingHours: "Mon-Sun 07:00-21:00",
   },
 ];
