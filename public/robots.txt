@@ -1,4 +1,4 @@
-# Domain not yet confirmed — keep in sync with SITE_URL in src/lib/seo/config.ts.
+# Keep in sync with SITE_URL in src/lib/seo/config.ts.
 User-agent: *
 Allow: /
 Disallow: /cart
@@ -6,4 +6,4 @@ Disallow: /checkout
 Disallow: /order-success
 Disallow: /admin
 
-Sitemap: https://aquatace.com/sitemap.xml
+Sitemap: https://aquatace.co.ke/sitemap.xml
