@@ -80,7 +80,7 @@ function CustomWaterPage() {
                   <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp for a quote
                 </a>
               </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full border-white/60 text-white hover:bg-white/10">
+              <Button asChild size="lg" variant="outline" className="rounded-full border-white/60 bg-transparent text-white hover:bg-white/10">
                 <a href={business.phoneHref}><PhoneCall className="mr-2 h-4 w-4" /> {business.phone}</a>
               </Button>
             </div>
