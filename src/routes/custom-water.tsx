@@ -86,7 +86,7 @@ function CustomWaterPage() {
             </div>
           </div>
           <div className="md:col-span-5">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
+            <div className="relative aspect-square overflow-hidden rounded-3xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
               <div className="absolute inset-0 grid grid-cols-3 gap-2 p-4">
                 {HERO_TILES.map((t) => (
                   <div key={t.label} className="relative flex flex-col items-center justify-end overflow-hidden rounded-2xl bg-white/15 p-2 text-[10px] font-semibold uppercase tracking-widest">
