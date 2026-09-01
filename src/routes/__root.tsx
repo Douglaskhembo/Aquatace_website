@@ -24,6 +24,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
 import { buildOrganizationSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/seo/config";
 
 function NotFoundComponent() {
   return (
@@ -102,7 +103,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a.",
       },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: `${SITE_URL}/branding/aquatace-logo-web.webp` },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: `${SITE_URL}/branding/aquatace-logo-web.webp` },
       {
         name: "twitter:title",
         content: "Aquatace Water & Gas — Water Refills & Cooking Gas Delivery in Nairobi",

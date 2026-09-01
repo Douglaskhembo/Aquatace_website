@@ -8,10 +8,10 @@ import { ProductCard } from "@/components/ProductCard";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { waLink } from "@/lib/business";
 import { productsQueryOptions } from "@/lib/products.functions";
-import flyerAsset from "@/assets/aquatace-flyer.png.asset.json";
 import { GAS_CATEGORY_IMAGE_URL } from "@/assets/gas-category-image";
 import catWater from "@/assets/cat-water.jpg";
 import catElectronics from "@/assets/cat-electronics.jpg";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/")({
   loader: ({ context }) => context.queryClient.ensureQueryData(productsQueryOptions),
@@ -21,11 +21,11 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a." },
       { property: "og:title", content: "Aquatace Water & Gas — Water Refills & Cooking Gas Delivery in Nairobi" },
       { property: "og:description", content: "Shop water refills, bottled water, 6kg & 13kg cooking gas and electronics. Delivery across Marurui, Kihunguro, Membley and Ting'ang'a." },
-      { property: "og:image", content: flyerAsset.url },
-      { name: "twitter:image", content: flyerAsset.url },
-      { property: "og:url", content: "/" },
+      { property: "og:image", content: `${SITE_URL}/branding/aquatace-logo-web.webp` },
+      { name: "twitter:image", content: `${SITE_URL}/branding/aquatace-logo-web.webp` },
+      { property: "og:url", content: SITE_URL },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: SITE_URL }],
   }),
   component: Home,
 });

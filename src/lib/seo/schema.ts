@@ -74,7 +74,7 @@ export function buildOrganizationSchema() {
     "@id": `${SITE_URL}#organization`,
     name: business.name,
     url: SITE_URL,
-    logo: LOGO_MASTER_URL,
+    logo: `${SITE_URL}${LOGO_MASTER_URL}`,
     telephone: business.phoneHref.replace("tel:", ""),
     email: business.email,
     ...(REAL_SOCIAL_LINKS.length > 0 ? { sameAs: REAL_SOCIAL_LINKS } : {}),
@@ -95,7 +95,9 @@ export function buildProductSchema(product: Product) {
     name: product.name,
     description: product.description,
     brand: { "@type": "Brand", name: product.brand },
-    ...(product.image ? { image: product.image } : {}),
+    ...(product.image
+      ? { image: product.image.startsWith("/") ? `${SITE_URL}${product.image}` : product.image }
+      : {}),
     offers: {
       "@type": "Offer",
       url: productUrl(product.slug),

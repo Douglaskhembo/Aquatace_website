@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { branches, waLink } from "@/lib/business";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/branches")({
   head: () => ({
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/branches")({
         content: "Walk-in pickup points plus nationwide delivery across Kenya.",
       },
     ],
-    links: [{ rel: "canonical", href: "/branches" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/branches` }],
   }),
   component: BranchesPage,
 });

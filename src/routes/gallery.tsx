@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { ImageIcon } from "lucide-react";
 import { listGalleryImages } from "@/lib/gallery.functions";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/gallery")({
   head: () => ({
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/gallery")({
       { property: "og:title", content: "Gallery — Aquatace Water & Gas" },
       { property: "og:description", content: "Real photos of Aquatace refill stations, gas cylinders and deliveries." },
     ],
-    links: [{ rel: "canonical", href: "/gallery" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/gallery` }],
   }),
   component: GalleryPage,
 });

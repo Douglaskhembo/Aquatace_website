@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
       { title: "Privacy Policy — Aquatace" },
       { name: "description", content: "How Aquatace collects, uses and protects your personal information." },
-      { property: "og:url", content: "/privacy" },
+      { property: "og:url", content: `${SITE_URL}/privacy` },
     ],
-    links: [{ rel: "canonical", href: "/privacy" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/privacy` }],
   }),
   component: PrivacyPage,
 });

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { business, waLink } from "@/lib/business";
 import { toast } from "sonner";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -15,9 +16,9 @@ export const Route = createFileRoute("/contact")({
       { title: "Contact us — Aquatace" },
       { name: "description", content: "Reach Aquatace by phone, WhatsApp or email. We're open 7 days a week across Nairobi." },
       { property: "og:title", content: "Contact Aquatace" },
-      { property: "og:url", content: "/contact" },
+      { property: "og:url", content: `${SITE_URL}/contact` },
     ],
-    links: [{ rel: "canonical", href: "/contact" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/contact` }],
   }),
   component: Contact,
 });

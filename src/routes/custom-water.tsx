@@ -4,6 +4,7 @@ import { Droplet, MessageCircle, PhoneCall, Sparkles, PartyPopper, HeartHandshak
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { business, waLink } from "@/lib/business";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/custom-water")({
   head: () => ({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/custom-water")({
       { property: "og:title", content: "Custom Branded Water for Events — Aquatace" },
       { property: "og:description", content: "Personalised water bottles for weddings, funerals, meetings and corporate events. Countrywide delivery in Kenya." },
     ],
-    links: [{ rel: "canonical", href: "/custom-water" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/custom-water` }],
   }),
   component: CustomWaterPage,
 });

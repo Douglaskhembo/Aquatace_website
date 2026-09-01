@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { branches, waLink } from "@/lib/business";
 import { branchLocalContent } from "@/lib/seo/geo";
 import { buildBranchSchema, buildBreadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/branches/$slug")({
   beforeLoad: ({ params }) => {
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/branches/$slug")({
         { name: "description", content: content.seoDescription },
         { property: "og:title", content: content.seoTitle },
         { property: "og:description", content: content.seoDescription },
-        { property: "og:url", content: `/branches/${branch.slug}` },
+        { property: "og:url", content: `${SITE_URL}/branches/${branch.slug}` },
         { "script:ld+json": buildBranchSchema(branch, content.nearbyAreas) },
         {
           "script:ld+json": buildBreadcrumbSchema([
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/branches/$slug")({
           ]),
         },
       ],
-      links: [{ rel: "canonical", href: `/branches/${branch.slug}` }],
+      links: [{ rel: "canonical", href: `${SITE_URL}/branches/${branch.slug}` }],
     };
   },
   component: BranchDetailPage,

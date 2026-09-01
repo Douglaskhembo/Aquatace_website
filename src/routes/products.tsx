@@ -11,6 +11,7 @@ import {
 import { ProductCard, EmptyState } from "@/components/ProductCard";
 import { categories, type CategorySlug } from "@/lib/products";
 import { productsQueryOptions } from "@/lib/products.functions";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/products")({
   loader: ({ context }) => context.queryClient.ensureQueryData(productsQueryOptions),
@@ -19,9 +20,9 @@ export const Route = createFileRoute("/products")({
       { title: "Shop all products — Aquatace Water & Gas" },
       { name: "description", content: "Browse water refills, bottled water and cooking gas from Aquatace Water & Gas. Filter, search and order in seconds." },
       { property: "og:title", content: "Shop — Aquatace" },
-      { property: "og:url", content: "/products" },
+      { property: "og:url", content: `${SITE_URL}/products` },
     ],
-    links: [{ rel: "canonical", href: "/products" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/products` }],
   }),
   component: ProductsPage,
 });

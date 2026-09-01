@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Award, Heart, Leaf, Users } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/about")({
   head: () => ({
@@ -10,9 +11,9 @@ export const Route = createFileRoute("/about")({
       { name: "description", content: "Aquatace is a Kenyan supplier of water refills, bottled water and cooking gas. Built on trust, delivered with care." },
       { property: "og:title", content: "About Aquatace Water & Gas" },
       { property: "og:description", content: "Clean. Pure. Reliable." },
-      { property: "og:url", content: "/about" },
+      { property: "og:url", content: `${SITE_URL}/about` },
     ],
-    links: [{ rel: "canonical", href: "/about" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
   }),
   component: About,
 });

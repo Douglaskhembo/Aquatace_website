@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { serviceAreas } from "@/lib/seo/geo";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/service-areas")({
   head: () => ({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/service-areas")({
           "Water, LPG gas and electronics delivery areas around Aquatace's Nairobi and Kiambu branches — Kasarani, Ruiru, Githurai, Kimbo, Tatu City, Juja and the Thika Road corridor.",
       },
     ],
-    links: [{ rel: "canonical", href: "/service-areas" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/service-areas` }],
   }),
   component: ServiceAreasPage,
 });

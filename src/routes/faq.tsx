@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/faq")({
   head: () => ({
@@ -7,9 +8,9 @@ export const Route = createFileRoute("/faq")({
       { title: "FAQ — Aquatace" },
       { name: "description", content: "Answers to common questions about ordering, delivery, gas refills and returns." },
       { property: "og:title", content: "Frequently asked questions" },
-      { property: "og:url", content: "/faq" },
+      { property: "og:url", content: `${SITE_URL}/faq` },
     ],
-    links: [{ rel: "canonical", href: "/faq" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/faq` }],
   }),
   component: FAQPage,
 });

@@ -10,6 +10,7 @@ import catWater from "@/assets/cat-water.jpg";
 import catElectronics from "@/assets/cat-electronics.jpg";
 import { GAS_CATEGORY_IMAGE_URL } from "@/assets/gas-category-image";
 import { ChevronRight, X } from "lucide-react";
+import { SITE_URL } from "@/lib/seo/config";
 
 const imgMap: Record<CategorySlug, string> = {
   water: catWater,
@@ -31,9 +32,9 @@ export const Route = createFileRoute("/category/$slug")({
         { name: "description", content: c.description },
         { property: "og:title", content: `${c.name} — Aquatace` },
         { property: "og:description", content: c.description },
-        { property: "og:url", content: `/category/${c.slug}` },
+        { property: "og:url", content: `${SITE_URL}/category/${c.slug}` },
       ],
-      links: [{ rel: "canonical", href: `/category/${c.slug}` }],
+      links: [{ rel: "canonical", href: `${SITE_URL}/category/${c.slug}` }],
     };
   },
   component: CategoryPage,

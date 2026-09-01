@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { branches, waLink } from "@/lib/business";
 import { getServiceArea, serviceAreas } from "@/lib/seo/geo";
 import { buildBreadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/service-areas/$slug")({
   beforeLoad: ({ params }) => {
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/service-areas/$slug")({
         { name: "description", content: area.seoDescription },
         { property: "og:title", content: area.seoTitle },
         { property: "og:description", content: area.seoDescription },
-        { property: "og:url", content: `/service-areas/${area.slug}` },
+        { property: "og:url", content: `${SITE_URL}/service-areas/${area.slug}` },
         {
           "script:ld+json": buildBreadcrumbSchema([
             { name: "Home", path: "/" },
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/service-areas/$slug")({
           ]),
         },
       ],
-      links: [{ rel: "canonical", href: `/service-areas/${area.slug}` }],
+      links: [{ rel: "canonical", href: `${SITE_URL}/service-areas/${area.slug}` }],
     };
   },
   component: ServiceAreaPage,

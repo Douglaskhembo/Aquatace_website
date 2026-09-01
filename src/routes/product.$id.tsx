@@ -25,6 +25,7 @@ import { useCart } from "@/lib/cart";
 import { waLink } from "@/lib/business";
 import { buildProductSchema } from "@/lib/seo/schema";
 import { toast } from "sonner";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/product/$id")({
   loader: async ({ context, params }) => {
@@ -42,10 +43,10 @@ export const Route = createFileRoute("/product/$id")({
         { name: "description", content: p.description },
         { property: "og:title", content: p.name },
         { property: "og:description", content: p.description },
-        { property: "og:url", content: `/product/${p.slug}` },
+        { property: "og:url", content: `${SITE_URL}/product/${p.slug}` },
         { "script:ld+json": buildProductSchema(p) },
       ],
-      links: [{ rel: "canonical", href: `/product/${p.slug}` }],
+      links: [{ rel: "canonical", href: `${SITE_URL}/product/${p.slug}` }],
     };
   },
   component: ProductPage,

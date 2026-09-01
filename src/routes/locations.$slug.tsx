@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { branches, waLink } from "@/lib/business";
 import { getCounty, getServiceArea } from "@/lib/seo/geo";
 import { buildBreadcrumbSchema } from "@/lib/seo/schema";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/locations/$slug")({
   beforeLoad: ({ params }) => {
@@ -21,7 +22,7 @@ export const Route = createFileRoute("/locations/$slug")({
         { name: "description", content: county.seoDescription },
         { property: "og:title", content: county.seoTitle },
         { property: "og:description", content: county.seoDescription },
-        { property: "og:url", content: `/locations/${county.slug}` },
+        { property: "og:url", content: `${SITE_URL}/locations/${county.slug}` },
         {
           "script:ld+json": buildBreadcrumbSchema([
             { name: "Home", path: "/" },
@@ -30,7 +31,7 @@ export const Route = createFileRoute("/locations/$slug")({
           ]),
         },
       ],
-      links: [{ rel: "canonical", href: `/locations/${county.slug}` }],
+      links: [{ rel: "canonical", href: `${SITE_URL}/locations/${county.slug}` }],
     };
   },
   component: CountyPage,

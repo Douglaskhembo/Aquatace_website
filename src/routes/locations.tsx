@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { counties } from "@/lib/seo/geo";
+import { SITE_URL } from "@/lib/seo/config";
 
 export const Route = createFileRoute("/locations")({
   head: () => ({
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/locations")({
           "Aquatace delivers purified water, LPG cooking gas and electronics across Nairobi and Kiambu counties, with dispatch to Murang'a County coordinated via our Membley hub.",
       },
     ],
-    links: [{ rel: "canonical", href: "/locations" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/locations` }],
   }),
   component: LocationsPage,
 });
