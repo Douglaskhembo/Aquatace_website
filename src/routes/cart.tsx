@@ -45,7 +45,12 @@ function CartPage() {
               <CardContent className="flex items-center gap-4 p-4">
                 <Link to="/product/$id" params={{ id: l.product.slug }} className="shrink-0">
                   <div className="h-20 w-20 overflow-hidden rounded-2xl sm:h-24 sm:w-24">
-                    <ProductImage category={l.product.category} size="sm" className="h-full w-full" />
+                    <ProductImage
+                      category={l.product.category}
+                      image={l.product.image}
+                      size="sm"
+                      className="h-full w-full"
+                    />
                   </div>
                 </Link>
                 <div className="grid min-w-0 flex-1 gap-1">

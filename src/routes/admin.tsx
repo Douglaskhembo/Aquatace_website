@@ -127,6 +127,9 @@ function ProductsPanel() {
   function invalidate() {
     queryClient.invalidateQueries({ queryKey: ["admin-products"] });
     queryClient.invalidateQueries({ queryKey: ["products"] });
+    // The public gallery includes every in-stock product's photo, so a
+    // product image edit needs to bust that cache too.
+    queryClient.invalidateQueries({ queryKey: ["gallery"] });
   }
 
   const deleteMutation = useMutation({

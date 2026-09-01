@@ -102,7 +102,12 @@ function ProductPage() {
                 key={i}
                 className="aspect-square overflow-hidden rounded-xl border border-border/60"
               >
-                <ProductImage category={p.category} size="sm" className="h-full w-full" />
+                <ProductImage
+                  category={p.category}
+                  image={p.image}
+                  size="sm"
+                  className="h-full w-full"
+                />
               </div>
             ))}
           </div>
