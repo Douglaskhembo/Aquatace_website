@@ -92,6 +92,21 @@ CREATE TABLE IF NOT EXISTS order_items (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Optional post-checkout rating/comment. order_id is nullable (and unique when
+-- set) so at most one review per order, while still allowing seed rows with no
+-- order at all. is_seed marks fabricated placeholder reviews used to fill out
+-- the public list before real feedback exists — see db/seed_reviews.sql.
+CREATE TABLE IF NOT EXISTS reviews (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  order_id UUID REFERENCES orders(id) ON DELETE SET NULL,
+  customer_name TEXT NOT NULL,
+  rating SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+  comment TEXT,
+  is_seed BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  UNIQUE (order_id)
+);
+
 -- Replaces Supabase Auth entirely: one row per admin login.
 CREATE TABLE IF NOT EXISTS admin_users (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -126,3 +141,4 @@ CREATE INDEX IF NOT EXISTS idx_gallery_images_sort ON gallery_images(sort_order)
 CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders(order_number);
 CREATE INDEX IF NOT EXISTS idx_orders_branch ON orders(assigned_branch_id);
 CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_seed_created ON reviews(is_seed, created_at DESC);

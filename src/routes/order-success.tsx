@@ -18,6 +18,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { getOrderByNumber } from "@/lib/orders.functions";
 import { formatKES } from "@/lib/products";
+import { ReviewForm } from "@/components/ReviewForm";
 
 export const Route = createFileRoute("/order-success")({
   validateSearch: (s) => z.object({ order: z.string().optional() }).parse(s),
@@ -210,6 +211,10 @@ function SuccessPage() {
             )}
           </CardContent>
         </Card>
+
+        {orderRow && (
+          <ReviewForm orderNumber={orderRow.order_number} customerName={orderRow.customer_name} />
+        )}
 
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Button asChild className="rounded-full">

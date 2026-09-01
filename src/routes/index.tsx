@@ -5,6 +5,7 @@ import { ArrowRight, Droplet, MessageCircle, Zap, Headphones, Truck, ShieldCheck
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProductCard } from "@/components/ProductCard";
+import { ReviewsSection } from "@/components/ReviewsSection";
 import { waLink } from "@/lib/business";
 import { productsQueryOptions } from "@/lib/products.functions";
 import flyerAsset from "@/assets/aquatace-flyer.png.asset.json";
@@ -147,7 +148,7 @@ function Home() {
       </section>
 
       {/* TRUST STRIP */}
-      <section className="container-page mt-14 mb-16">
+      <section className="container-page mt-14">
         <Card className="rounded-3xl border-border/60 shadow-[var(--shadow-soft)]">
           <CardContent className="grid gap-6 p-6 sm:grid-cols-3">
             {[
@@ -168,6 +169,9 @@ function Home() {
           </CardContent>
         </Card>
       </section>
+
+      {/* REVIEWS */}
+      <ReviewsSection />
     </div>
   );
 }
